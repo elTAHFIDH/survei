@@ -1,0 +1,6 @@
+# Jangan di-upload ke GitHub (repo publik)
+apps-script.gs
+CLAUDE.md
+PANDUAN.md
+.claude/
+Kunjungan/

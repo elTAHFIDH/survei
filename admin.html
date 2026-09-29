@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin Kunjungan | elTAHFIDH</title>
+<meta name="theme-color" content="#14225A">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #14225A; --sky: #2F8FE3; --sky-soft: #E4EFFB; --bg: #EEF3F9;
+    --paper: #FFFFFF; --ink: #172033; --muted: #5A6680; --line: #D3DCEA;
+    --red: #C8202F; --red-soft: #FCE8EA; --green: #1B9A55; --green-soft: #E3F5EA;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.45; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  .top { background: var(--navy); color: #fff; padding: calc(12px + env(safe-area-inset-top, 0px)) 20px 12px; position: sticky; top: 0; z-index: 5; }
+  .top-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { font-weight: 800; font-size: 17px; }
+  .brand small { display: block; font-weight: 500; font-size: 12px; opacity: .75; }
+  .top-btns { display: flex; gap: 8px; }
+  .tbtn { background: rgba(255,255,255,.12); color: #fff; border: 0; border-radius: 10px; padding: 9px 14px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .tbtn:hover { background: rgba(255,255,255,.2); }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 48px; }
+
+  /* Login */
+  .login { max-width: 380px; margin: 60px auto; background: var(--paper); border-radius: 20px; padding: 28px 24px; }
+  .login h1 { margin: 0 0 6px; font-size: 24px; color: var(--navy); letter-spacing: -0.02em; }
+  .login p { margin: 0 0 18px; color: var(--muted); font-size: 14.5px; }
+  .input { width: 100%; padding: 13px 14px; border-radius: 10px; border: 1.5px solid var(--line); font-size: 16px; background: #fff; }
+  .input:focus { border-color: var(--sky); outline: none; box-shadow: 0 0 0 3px rgba(47,143,227,.18); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 12px; padding: 13px 16px; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 15px; }
+  .btn-primary { background: var(--navy); color: #fff; width: 100%; margin-top: 12px; }
+  .btn-primary:disabled { opacity: .5; }
+  .err { color: var(--red); font-weight: 600; font-size: 14px; margin-top: 10px; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .stat { background: var(--paper); border-radius: 16px; padding: 14px 16px; }
+  .stat .n { font-size: 30px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; line-height: 1.1; }
+  .stat .k { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .stat.warn .n { color: var(--red); }
+  .stat.good .n { color: var(--green); }
+  @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } .stat:first-child { grid-column: span 2; } }
+
+  /* Toolbar */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin: 22px 0 14px; }
+  .tabs { display: flex; gap: 4px; background: var(--paper); padding: 4px; border-radius: 12px; overflow-x: auto; }
+  .tab { border: 0; background: transparent; padding: 9px 14px; border-radius: 9px; font-weight: 700; font-size: 14px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .tab[aria-selected="true"] { background: var(--navy); color: #fff; }
+  .search { flex: 1; min-width: 200px; max-width: 320px; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; font-size: 15px; }
+
+  /* Groups */
+  .group { margin-top: 22px; }
+  .group-h { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+  .group-h h2 { margin: 0; font-size: 17px; color: var(--navy); letter-spacing: -0.01em; }
+  .group-h .c { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .group-h .today-tag { background: var(--sky); color: #fff; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+
+  .card { background: var(--paper); border-radius: 16px; padding: 14px 16px; display: grid; grid-template-columns: 76px 1fr auto; gap: 14px; align-items: center; margin-bottom: 8px; border-left: 4px solid transparent; }
+  .card.hadir { border-left-color: var(--green); }
+  .card.absen { border-left-color: var(--red); }
+  .jam { font-size: 22px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; }
+  .jam small { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+  .who { min-width: 0; }
+  .who .nm { font-weight: 800; font-size: 16px; }
+  .who .sub { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+  .who .meta { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  .who .meta b { color: var(--navy); }
+  .note { margin-top: 6px; font-size: 13px; background: var(--sky-soft); color: var(--navy); padding: 6px 10px; border-radius: 8px; }
+  .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .a { border: 1.5px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 12px; font-weight: 700; font-size: 13.5px; cursor: pointer; text-decoration: none; color: var(--navy); white-space: nowrap; }
+  .a:hover { border-color: var(--navy); }
+  .a.on { background: var(--green); border-color: var(--green); color: #fff; }
+  .a.wa { color: var(--green); }
+  @media (max-width: 640px) {
+    .card { grid-template-columns: 62px 1fr; }
+    .acts { grid-column: 1 / -1; justify-content: flex-start; }
+  }
+
+  .empty { background: var(--paper); border-radius: 16px; padding: 32px 20px; text-align: center; color: var(--muted); }
+  .empty b { display: block; color: var(--navy); font-size: 16px; margin-bottom: 4px; }
+  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; z-index: 10; }
+  .demo { background: var(--red-soft); color: var(--red); font-weight: 600; font-size: 13.5px; padding: 10px 14px; border-radius: 12px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">Admin Kunjungan<small>Pesantren Qur'an elTAHFIDH</small></div>
+    <div class="top-btns" id="topBtns" hidden>
+      <button class="tbtn" id="refresh">Muat ulang</button>
+      <button class="tbtn" id="logout">Keluar</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Login -->
+  <section class="login" id="loginView">
+    <h1>Masuk admin</h1>
+    <p>Lihat dan kelola jadwal kunjungan keluarga.</p>
+    <form id="loginForm">
+      <label for="pw" style="font-weight:700;font-size:14px;display:block;margin-bottom:6px">Password</label>
+      <input class="input" id="pw" type="password" autocomplete="current-password" required>
+      <button class="btn btn-primary" id="loginBtn" type="submit">Masuk</button>
+      <div class="err" id="loginErr" role="alert"></div>
+    </form>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="dash" hidden>
+    <div class="demo" id="demoNote" hidden>Mode uji: URL Apps Script belum dipasang. Data di bawah hanya contoh.</div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="sToday">0</div><div class="k">Kunjungan hari ini</div></div>
+      <div class="stat"><div class="n" id="sWeek">0</div><div class="k">7 hari ke depan</div></div>
+      <div class="stat"><div class="n" id="sTotal">0</div><div class="k">Total booking</div></div>
+      <div class="stat good"><div class="n" id="sHadir">0</div><div class="k">Sudah hadir</div></div>
+      <div class="stat warn"><div class="n" id="sAbsen">0</div><div class="k">Tidak datang</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" data-tab="today" aria-selected="true">Hari ini</button>
+        <button class="tab" role="tab" data-tab="upcoming" aria-selected="false">Mendatang</button>
+        <button class="tab" role="tab" data-tab="past" aria-selected="false">Sudah lewat</button>
+        <button class="tab" role="tab" data-tab="all" aria-selected="false">Semua</button>
+      </div>
+      <input class="search" id="q" type="search" placeholder="Cari nama, kode, atau nomor WA" aria-label="Cari booking">
+    </div>
+
+    <div id="list"></div>
+  </section>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ================== PENGATURAN ================== */
+const CONFIG = {
+  API_URL: 'PASTE_URL_APPS_SCRIPT_DI_SINI',   // sama dengan di index.html
+  MAPS_URL: 'https://maps.app.goo.gl/Fx6QXJ944LKUkGZv8'
+};
+/* ================================================ */
+
+const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const parseYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const tglPanjang = s => { const d = parseYmd(s); return HARI[d.getDay()] + ', ' + d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear(); };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const isDemo = () => !CONFIG.API_URL || CONFIG.API_URL.startsWith('PASTE');
+
+let rows = [];
+let tab = 'today';
+let password = sessionStorage.getItem('kj_pw') || '';
+
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200);
+}
+
+async function api(payload) {
+  const res = await fetch(CONFIG.API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ ...payload, password })
+  });
+  const out = await res.json();
+  if (!out.ok) throw new Error(out.error || 'Permintaan gagal.');
+  return out;
+}
+
+function demoRows() {
+  const t = new Date(); const add = n => { const d = new Date(t); d.setDate(d.getDate() + n); return ymd(d); };
+  return [
+    { kode: 'KJ-0001', waktu: add(-3) + ' 20:14', ortu: 'Siti Aminah', wa: '6281234567890', santri: 'Ahmad Faiz', jenjang: 'SMP', kelas: 'SD Kelas 6', domisili: 'Bekasi', tanggal: add(-1), sesi: '08.00', hadir: true, catatan: '' },
+    { kode: 'KJ-0002', waktu: add(-2) + ' 09:02', ortu: 'Budi Santoso', wa: '6285712345678', santri: 'Rayhan', jenjang: 'SMA', kelas: 'SMP Kelas 9', domisili: 'Cibubur', tanggal: add(-1), sesi: '11.00', hadir: false, catatan: '' },
+    { kode: 'KJ-0003', waktu: add(-1) + ' 19:40', ortu: 'Nurul Hidayah', wa: '6281398765432', santri: 'Zahra', jenjang: 'SMP', kelas: 'SD Kelas 6', domisili: 'Cileungsi', tanggal: add(0), sesi: '15.00', hadir: false, catatan: 'Datang bersama kakek' },
+    { kode: 'KJ-0004', waktu: add(0) + ' 07:11', ortu: 'Hendra Wijaya', wa: '6281122334455', santri: 'Fathan', jenjang: 'SMA', kelas: 'SMP Kelas 9', domisili: 'Depok', tanggal: add(3), sesi: '08.00', hadir: false, catatan: '' }
+  ];
+}
+
+/* ---------- Login ---------- */
+$('#loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  password = $('#pw').value;
+  $('#loginErr').textContent = '';
+  $('#loginBtn').disabled = true; $('#loginBtn').textContent = 'Memeriksa...';
+  try {
+    if (!isDemo()) await api({ action: 'login' });
+    sessionStorage.setItem('kj_pw', password);
+    await openDash();
+  } catch (err) {
+    $('#loginErr').textContent = /Password/i.test(err.message) ? 'Password salah. Coba lagi.' : 'Tidak bisa terhubung. Periksa URL Apps Script dan koneksi internet.';
+  } finally {
+    $('#loginBtn').disabled = false; $('#loginBtn').textContent = 'Masuk';
+  }
+});
+
+$('#logout').addEventListener('click', () => {
+  sessionStorage.removeItem('kj_pw'); password = '';
+  $('#dash').hidden = true; $('#topBtns').hidden = true; $('#loginView').hidden = false; $('#pw').value = '';
+});
+
+async function openDash() {
+  $('#loginView').hidden = true; $('#dash').hidden = false; $('#topBtns').hidden = false;
+  $('#demoNote').hidden = !isDemo();
+  await load();
+}
+
+async function load() {
+  $('#list').innerHTML = '<div class="empty">Memuat data...</div>';
+  try {
+    rows = isDemo() ? demoRows() : (await api({ action: 'list' })).rows;
+    render();
+  } catch (err) {
+    if (/Password/i.test(err.message)) { $('#logout').click(); $('#loginErr').textContent = 'Sesi berakhir. Masuk lagi.'; return; }
+    $('#list').innerHTML = '<div class="empty"><b>Data tidak termuat</b>Periksa koneksi lalu tekan Muat ulang.</div>';
+  }
+}
+$('#refresh').addEventListener('click', load);
+
+/* ---------- Render ---------- */
+function render() {
+  const todayKey = ymd(new Date());
+  const in7 = new Date(); in7.setDate(in7.getDate() + 7); const in7Key = ymd(in7);
+
+  $('#sToday').textContent = rows.filter(r => r.tanggal === todayKey).length;
+  $('#sWeek').textContent = rows.filter(r => r.tanggal >= todayKey && r.tanggal <= in7Key).length;
+  $('#sTotal').textContent = rows.length;
+  $('#sHadir').textContent = rows.filter(r => r.hadir).length;
+  $('#sAbsen').textContent = rows.filter(r => !r.hadir && r.tanggal < todayKey).length;
+
+  const q = $('#q').value.trim().toLowerCase();
+  let list = rows.filter(r => {
+    if (tab === 'today') return r.tanggal === todayKey;
+    if (tab === 'upcoming') return r.tanggal >= todayKey;
+    if (tab === 'past') return r.tanggal < todayKey;
+    return true;
+  });
+  if (q) list = list.filter(r => [r.ortu, r.santri, r.kode, r.wa, r.domisili].join(' ').toLowerCase().includes(q));
+
+  const desc = tab === 'past' || tab === 'all';
+  list.sort((a, b) => (a.tanggal + a.sesi).localeCompare(b.tanggal + b.sesi) * (desc ? -1 : 1));
+
+  if (!list.length) {
+    const msg = { today: 'Belum ada kunjungan untuk hari ini.', upcoming: 'Belum ada booking mendatang.', past: 'Belum ada kunjungan yang lewat.', all: 'Belum ada booking masuk.' }[tab];
+    $('#list').innerHTML = '<div class="empty"><b>' + (q ? 'Tidak ada yang cocok' : msg) + '</b>' + (q ? 'Coba kata kunci lain.' : 'Booking baru akan muncul di sini.') + '</div>';
+    return;
+  }
+
+  const groups = {};
+  list.forEach(r => (groups[r.tanggal] = groups[r.tanggal] || []).push(r));
+  $('#list').innerHTML = Object.keys(groups).map(tgl => {
+    const items = groups[tgl];
+    return '<div class="group"><div class="group-h"><h2>' + esc(tglPanjang(tgl)) + '</h2>' +
+      (tgl === todayKey ? '<span class="today-tag">Hari ini</span>' : '') +
+      '<span class="c">' + items.length + ' keluarga</span></div>' +
+      items.map(r => card(r, tgl < todayKey)).join('') + '</div>';
+  }).join('');
+}
+
+function card(r, lewat) {
+  const cls = r.hadir ? 'hadir' : (lewat ? 'absen' : '');
+  const reminder = 'Assalamualaikum Ayah/Bunda ' + r.ortu + ', kami mengingatkan jadwal kunjungan ke Pesantren Qur\'an elTAHFIDH:\n\n' +
+    'Tanggal: ' + tglPanjang(r.tanggal) + '\nPerkiraan jam: ' + r.sesi + ' WIB\nKode booking: ' + r.kode + '\n\n' +
+    'Lokasi: ' + CONFIG.MAPS_URL + '\n\nSampai jumpa, insyaAllah.';
+  const chat = 'Assalamualaikum Ayah/Bunda ' + r.ortu + ', kami dari Pesantren Qur\'an elTAHFIDH terkait kunjungan (kode ' + r.kode + ').';
+  return '<div class="card ' + cls + '">' +
+    '<div class="jam">' + esc(r.sesi) + '<small>WIB</small></div>' +
+    '<div class="who"><div class="nm">' + esc(r.ortu) + '</div>' +
+    '<div class="sub">' + esc(r.santri) + ', ' + esc(r.jenjang) + ', ' + esc(r.kelas) + ', dari ' + esc(r.domisili) + '</div>' +
+    '<div class="meta"><b>' + esc(r.kode) + '</b>, booking ' + esc(r.waktu) + ', WA ' + esc(r.wa) + '</div>' +
+    (r.catatan ? '<div class="note">' + esc(r.catatan) + '</div>' : '') + '</div>' +
+    '<div class="acts">' +
+      '<button class="a ' + (r.hadir ? 'on' : '') + '" data-hadir="' + esc(r.kode) + '" aria-pressed="' + r.hadir + '">' + (r.hadir ? 'Hadir' : 'Tandai hadir') + '</button>' +
+      '<a class="a wa" target="_blank" rel="noopener" href="https://wa.me/' + esc(r.wa) + '?text=' + encodeURIComponent(reminder) + '">Reminder WA</a>' +
+      '<a class="a" target="_blank" rel="noopener" href="https://wa.me/' + esc(r.wa) + '?text=' + encodeURIComponent(chat) + '">Chat</a>' +
+      '<button class="a" data-note="' + esc(r.kode) + '">Catatan</button>' +
+    '</div></div>';
+}
+
+/* ---------- Aksi ---------- */
+$('#list').addEventListener('click', async e => {
+  const h = e.target.closest('[data-hadir]');
+  const n = e.target.closest('[data-note]');
+  if (h) {
+    const r = rows.find(x => x.kode === h.dataset.hadir);
+    const prev = r.hadir; r.hadir = !prev; render();
+    try {
+      if (!isDemo()) await api({ action: 'setHadir', kode: r.kode, hadir: r.hadir });
+      toast(r.hadir ? 'Ditandai hadir' : 'Tanda hadir dibatalkan');
+    } catch (err) { r.hadir = prev; render(); toast('Gagal menyimpan. Coba lagi.'); }
+  }
+  if (n) {
+    const r = rows.find(x => x.kode === n.dataset.note);
+    const val = prompt('Catatan untuk ' + r.ortu + ' (' + r.kode + '):', r.catatan || '');
+    if (val === null) return;
+    const prev = r.catatan; r.catatan = val.trim(); render();
+    try {
+      if (!isDemo()) await api({ action: 'setCatatan', kode: r.kode, catatan: r.catatan });
+      toast('Catatan disimpan');
+    } catch (err) { r.catatan = prev; render(); toast('Gagal menyimpan. Coba lagi.'); }
+  }
+});
+
+$$('.tab').forEach(t => t.addEventListener('click', () => {
+  tab = t.dataset.tab;
+  $$('.tab').forEach(x => x.setAttribute('aria-selected', x === t ? 'true' : 'false'));
+  render();
+}));
+$('#q').addEventListener('input', render);
+
+if (password) openDash();
+</script>
+</body>
+</html>
