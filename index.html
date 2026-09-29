@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Booking Kunjungan | Pesantren Qur'an elTAHFIDH</title>
-<meta name="description" content="Jadwalkan kunjungan keluarga ke Pesantren Qur'an elTAHFIDH, Cileungsi Bogor.">
+<title>Booking Survei | Pesantren Qur'an elTAHFIDH</title>
+<meta name="description" content="Jadwalkan survei keluarga ke Pesantren Qur'an elTAHFIDH, Cileungsi Bogor.">
 <meta name="theme-color" content="#14225A">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕌</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -226,11 +226,15 @@
     background: #fff; border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     padding: 8px 22px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
   }
-  .t-code { font-size: 30px; font-weight: 800; letter-spacing: 0.04em; color: var(--navy); line-height: 1.1; }
+  .t-code { font-size: clamp(24px, 7vw, 30px); font-weight: 800; letter-spacing: 0.03em; color: var(--navy); line-height: 1.1; white-space: nowrap; }
   .stamp {
+    display: inline-block; margin-top: 12px;
     border: 2.5px solid var(--red); color: var(--red); border-radius: 8px;
     padding: 5px 10px; font-weight: 800; font-size: 13px; transform: rotate(-6deg);
   }
+  .t-qr { flex: none; text-align: center; }
+  .t-qr canvas { display: block; width: 104px; height: 104px; }
+  .t-qr-lbl { font-size: 11px; font-weight: 700; color: var(--muted); margin-top: 4px; }
   .t-note { text-align: center; color: var(--muted); font-size: 13.5px; margin: 18px 8px 16px; }
   .t-actions { display: grid; gap: 10px; }
   .t-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -318,7 +322,7 @@
   <!-- 1. Data keluarga -->
   <section class="panel step" data-step="1" hidden>
     <h2 tabindex="-1">Data keluarga</h2>
-    <p class="lead">Kami pakai untuk menyiapkan kunjungan dan menghubungi Ayah/Bunda.</p>
+    <p class="lead">Kami pakai untuk menyiapkan survei dan menghubungi Ayah/Bunda.</p>
     <form id="f1" novalidate>
       <div class="field">
         <label for="ortu">Nama orang tua</label>
@@ -371,7 +375,7 @@
 
   <!-- 2. Tanggal -->
   <section class="panel step" data-step="2" hidden>
-    <h2 tabindex="-1">Pilih tanggal kunjungan</h2>
+    <h2 tabindex="-1">Pilih tanggal survei</h2>
     <p class="lead">Semua hari bisa dipilih.</p>
     <div class="cal">
       <div class="cal-head">
@@ -396,17 +400,17 @@
     <div class="formerr" id="submitErr" role="alert" hidden></div>
     <div class="actions">
       <button type="button" class="btn btn-ghost" data-go="2">Kembali</button>
-      <button type="button" class="btn btn-primary" id="submitBtn" disabled>Buat tiket kunjungan</button>
+      <button type="button" class="btn btn-primary" id="submitBtn" disabled>Buat tiket survei</button>
     </div>
   </section>
 
   <!-- 4. Tiket -->
   <section class="step ticket-wrap" data-step="4" hidden>
-    <h2 tabindex="-1" class="hp">Tiket kunjungan</h2>
+    <h2 tabindex="-1" class="hp">Tiket survei</h2>
     <div class="ticket" id="ticket">
       <div class="t-head">
         <div class="t-arab" lang="ar">أهلًا وسهلًا</div>
-        <div class="t-title">Tiket kunjungan keluarga</div>
+        <div class="t-title">Tiket survei pesantren</div>
         <div class="t-name" id="tOrtu"></div>
       </div>
       <div class="t-body">
@@ -424,8 +428,15 @@
       </div>
       <div class="t-cut" aria-hidden="true"></div>
       <div class="t-stub">
-        <div><div class="t-k">Kode booking</div><div class="t-code" id="tKode"></div></div>
-        <div class="stamp">Terjadwal</div>
+        <div>
+          <div class="t-k">Kode booking</div>
+          <div class="t-code" id="tKode"></div>
+          <div class="stamp">Terjadwal</div>
+        </div>
+        <div class="t-qr" id="tQr" hidden>
+          <canvas id="qrCanvas" width="384" height="384" role="img" aria-label="QR lokasi pesantren di Google Maps"></canvas>
+          <div class="t-qr-lbl">Scan lokasi</div>
+        </div>
       </div>
     </div>
     <p class="t-note">Simpan tiket ini dan tunjukkan kodenya saat tiba di pesantren.</p>
@@ -446,7 +457,7 @@
       </div>
       <a class="btn btn-outline" id="mapsBtn" target="_blank" rel="noopener">Buka lokasi di Maps</a>
       <div class="follow">
-        <p>Sambil menunggu hari kunjungan, lihat keseharian santri di Instagram dan Facebook kami</p>
+        <p>Sambil menunggu hari survei, lihat keseharian santri di Instagram dan Facebook kami</p>
         <div class="follow-btns">
           <a class="btn" href="https://www.instagram.com/eltahfidh.indonesia/" target="_blank" rel="noopener">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
@@ -548,6 +559,14 @@ function normWa(v) {
   return /^628\d{7,12}$/.test(s) ? s : '';
 }
 
+// "ahmad fauzi" → "Ahmad Fauzi"
+const kapital = s => s.toLowerCase().replace(/\s+/g, ' ')
+  .replace(/(^|[\s\-.(])(\p{L})/gu, (m, a, b) => a + b.toUpperCase());
+['ortu', 'santri'].forEach(id => {
+  const inp = document.getElementById(id);
+  inp.addEventListener('blur', () => { inp.value = kapital(inp.value.trim()); });
+});
+
 function setErr(id, msg) {
   $('#e-' + id).textContent = msg;
   const inp = document.getElementById(id);
@@ -567,7 +586,7 @@ $('#f1').addEventListener('submit', e => {
   check('kelas', !!v('kelas'), 'Pilih kelas anak saat ini.');
   check('domisili', v('domisili').length >= 2, 'Isi kota atau kecamatan.');
   if (!ok) { if (first) document.getElementById(first).focus(); return; }
-  Object.assign(state.data, { ortu: v('ortu'), wa: normWa(v('wa')), santri: v('santri'), kelas: v('kelas'), domisili: v('domisili') });
+  Object.assign(state.data, { ortu: kapital(v('ortu')), wa: normWa(v('wa')), santri: kapital(v('santri')), kelas: v('kelas'), domisili: v('domisili') });
   go(2);
 });
 ['ortu','wa','santri','kelas','domisili'].forEach(id =>
@@ -650,7 +669,7 @@ $('#submitBtn').addEventListener('click', async () => {
     let kode;
     if (isDemo()) {
       await new Promise(r => setTimeout(r, 600));
-      kode = 'KJ-' + pad(Math.floor(Math.random() * 90) + 10) + pad(Math.floor(Math.random() * 90) + 10);
+      kode = state.data.jenjang + '-' + String(new Date().getFullYear()).slice(2) + String(Math.floor(Math.random() * 900) + 100);
     } else {
       const res = await fetch(CONFIG.API_URL, {
         method: 'POST',
@@ -668,7 +687,7 @@ $('#submitBtn').addEventListener('click', async () => {
       : 'Booking belum tersimpan. Periksa koneksi internet lalu coba lagi.';
     err.hidden = false;
   } finally {
-    btn.textContent = 'Buat tiket kunjungan';
+    btn.textContent = 'Buat tiket survei';
     btn.disabled = !state.sesi;
   }
 });
@@ -684,7 +703,7 @@ function showTicket(kode) {
   $('#tAlamat').textContent = CONFIG.ALAMAT;
   $('#tKode').textContent = kode;
   const msg = 'Assalamu\'alaikum warahmatullahi wabarakatuh 🙏\n\n' +
-    'Konfirmasi kunjungan *' + kode + '*\n\n' +
+    'Konfirmasi survei *' + kode + '*\n\n' +
     'Saya ' + d.ortu + ', orang tua dari ' + d.santri + ' (calon santri ' + d.jenjang + ' Qur\'an elTAHFIDH).\n' +
     '📅 ' + tglPanjang(state.tanggal) + '\n' +
     '🕗 Sekitar pukul ' + state.sesi + ' WIB\n\n' +
@@ -692,8 +711,70 @@ function showTicket(kode) {
   $('#waBtn').href = 'https://wa.me/' + CONFIG.WA_ADMIN + '?text=' + encodeURIComponent(msg);
   $('#mapsBtn').href = CONFIG.MAPS_URL;
   setCalendar(kode);
+  renderQr();
   $('#demoNote').hidden = !isDemo();
   go(4);
+}
+
+/* ---------- Tiket: QR lokasi (Google Maps) ---------- */
+const QR_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+let qrDone = false;
+
+async function renderQr() {
+  if (qrDone) return;
+  try {
+    if (!window.qrcode) await loadScript(QR_LIB);
+    const qr = qrcode(0, 'H'); // koreksi H supaya tetap terbaca walau tengahnya ditutup ikon
+    qr.addData(CONFIG.MAPS_URL);
+    qr.make();
+    const n = qr.getModuleCount();
+    const cv = $('#qrCanvas'), ctx = cv.getContext('2d');
+    const cell = cv.width / (n + 2), off = cell; // 1 modul margin putih
+    const NAVY = '#14225A';
+    const box = (x, y, w, r, color) => {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x, y, w, w, r); else ctx.rect(x, y, w, w);
+      ctx.fill();
+    };
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, cv.width, cv.height);
+
+    const finder = (r, c) => (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7);
+    let mid = Math.round(n * 0.24); if (mid % 2 === 0) mid++;
+    const m0 = (n - mid) / 2;
+    const center = (r, c) => r >= m0 && r < m0 + mid && c >= m0 && c < m0 + mid;
+
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        if (!qr.isDark(r, c) || finder(r, c) || center(r, c)) continue;
+        box(off + c * cell + cell * 0.06, off + r * cell + cell * 0.06, cell * 0.88, cell * 0.3, NAVY);
+      }
+    }
+    // Mata QR bulat
+    [[0, 0], [0, n - 7], [n - 7, 0]].forEach(([r, c]) => {
+      const x = off + c * cell, y = off + r * cell;
+      box(x, y, cell * 7, cell * 2, NAVY);
+      box(x + cell, y + cell, cell * 5, cell * 1.4, '#fff');
+      box(x + cell * 2, y + cell * 2, cell * 3, cell, NAVY);
+    });
+    // Ikon pin lokasi di tengah
+    const cx = off + m0 * cell, cw = mid * cell;
+    box(cx, cx, cw, cell * 1.5, '#fff');
+    ctx.save();
+    ctx.translate(cx + cw * 0.12, cx + cw * 0.12);
+    ctx.scale(cw * 0.76 / 24, cw * 0.76 / 24);
+    ctx.fillStyle = '#C8202F';
+    ctx.fill(new Path2D('M12 1.5a7.5 7.5 0 0 0-7.5 7.5c0 5.6 7.5 13.5 7.5 13.5s7.5-7.9 7.5-13.5A7.5 7.5 0 0 0 12 1.5z'));
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(12, 9, 2.8, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    $('#tQr').hidden = false;
+    qrDone = true;
+  } catch (e) {
+    $('#tQr').hidden = true; // tanpa QR pun tiket tetap jalan
+  }
 }
 
 /* ---------- Tiket: kalender & simpan gambar ---------- */
@@ -705,7 +786,7 @@ function setCalendar(kode) {
   const [y, m, dd] = state.tanggal.split('-');
   const jam = parseInt(state.sesi, 10);
   const stamp = h => y + m + dd + 'T' + pad(h) + '0000';
-  const judul = 'Kunjungan ke Pesantren elTAHFIDH (' + kode + ')';
+  const judul = 'Survei ke Pesantren elTAHFIDH (' + kode + ')';
   const ket = 'Kode booking: ' + kode + '\nCalon santri: ' + d.santri + ' (' + d.jenjang + ')\n' +
     'Tunjukkan kode booking saat tiba.\nLokasi: ' + CONFIG.MAPS_URL;
   const lokasi = 'Pesantren Qur\'an elTAHFIDH, ' + CONFIG.ALAMAT;
@@ -722,7 +803,7 @@ function setCalendar(kode) {
     if (icsUrl) URL.revokeObjectURL(icsUrl);
     icsUrl = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
     $('#calBtn').href = icsUrl;
-    $('#calBtn').setAttribute('download', 'kunjungan-' + kode + '.ics');
+    $('#calBtn').setAttribute('download', 'survei-' + kode + '.ics');
   } else {
     // Android & lainnya: Google Calendar
     $('#calBtn').removeAttribute('download');
@@ -755,7 +836,7 @@ $('#saveBtn').addEventListener('click', async () => {
     const file = new File([blob], 'tiket-' + kode + '.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       // HP: buka menu bagikan, ortu bisa pilih "Simpan gambar"
-      await navigator.share({ files: [file], title: 'Tiket kunjungan ' + kode }).catch(() => {});
+      await navigator.share({ files: [file], title: 'Tiket survei ' + kode }).catch(() => {});
     } else {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
