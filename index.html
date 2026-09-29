@@ -6,6 +6,14 @@
 <title>Booking Survei | Pesantren Qur'an elTAHFIDH</title>
 <meta name="description" content="Jadwalkan survei keluarga ke Pesantren Qur'an elTAHFIDH, Cileungsi Bogor.">
 <meta name="theme-color" content="#14225A">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://eltahfidh.github.io/survei/">
+<meta property="og:title" content="Booking Survei Pesantren Qur'an elTAHFIDH">
+<meta property="og:description" content="Ajak ananda mengenal calon rumah keduanya. Pilih jadwal survei, kami temani berkeliling.">
+<meta property="og:image" content="https://eltahfidh.github.io/survei/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕌</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,6 +83,48 @@
 
   /* Intro */
   .intro h1 { margin-top: 4px; }
+  /* Foto */
+  .hero {
+    display: block; width: calc(100% + 40px); height: auto; aspect-ratio: 16 / 9; object-fit: cover;
+    margin: -24px -20px 20px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--sky-soft);
+  }
+  .slider { position: relative; margin-bottom: 14px; }
+  .slides {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: var(--radius-md);
+    scrollbar-width: none; background: var(--navy);
+  }
+  .slides::-webkit-scrollbar { display: none; }
+  .slides img {
+    flex: 0 0 100%; width: 100%; aspect-ratio: 16 / 10; height: auto; object-fit: cover;
+    scroll-snap-align: center; display: block;
+  }
+  .slides img.fit { object-fit: contain; }
+  .dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+  .dots button {
+    width: 8px; height: 8px; padding: 0; border: 0; border-radius: 99px; background: var(--line); cursor: pointer;
+    transition: width .2s, background .2s;
+  }
+  .dots button[aria-current="true"] { width: 20px; background: var(--navy); }
+  /* Tiket yang pernah dibuat di HP ini */
+  .mytix { display: grid; gap: 10px; margin-bottom: 20px; }
+  .mytix-item {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    border-radius: var(--radius-md); background: var(--navy); color: #fff;
+    position: relative; overflow: hidden;
+  }
+  .mytix-item::before {
+    content: ''; position: absolute; right: -30px; top: -30px; width: 90px; height: 90px;
+    border-radius: 50%; border: 14px solid rgba(47,143,227,.35);
+  }
+  .mytix-tx { flex: 1; min-width: 0; position: relative; }
+  .mytix-k { font-size: 12px; font-weight: 600; opacity: .75; }
+  .mytix-code { font-size: 18px; font-weight: 800; letter-spacing: 0.02em; line-height: 1.25; }
+  .mytix-when { font-size: 13px; font-weight: 600; opacity: .9; }
+  .mytix-item button {
+    flex: none; position: relative; padding: 10px 14px; border-radius: var(--radius-sm); border: 0;
+    background: #fff; color: var(--navy); font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+  .intro .salam { display: block; color: var(--red); text-transform: uppercase; }
   .facts { list-style: none; padding: 0; margin: 22px 0 24px; display: grid; gap: 10px; }
   .facts li {
     display: flex; gap: 12px; align-items: center;
@@ -259,10 +309,44 @@
   .follow-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .follow-btns .btn { padding: 12px 10px; font-size: 14.5px; background: #fff; color: var(--navy); border: 1.5px solid var(--line); }
 
-  .step { animation: none; }
+  /* Spinner di tombol saat menyimpan */
+  .spin {
+    width: 18px; height: 18px; border-radius: 50%; flex: none;
+    border: 2.5px solid rgba(255,255,255,.35); border-top-color: #fff;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
   @media (prefers-reduced-motion: no-preference) {
-    .ticket { animation: rise .5s cubic-bezier(.2,.8,.2,1) both; }
-    @keyframes rise { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+    /* Tekan–membal: mengecil saat ditekan, "pop" saat terpilih */
+    .prog-pick button, .seg button, .day, .sess, .mytix-item button {
+      transition: transform .12s ease, background .15s, border-color .15s;
+    }
+    .prog-pick button:active, .seg button:active, .day:active:not(:disabled),
+    .sess:active:not(:disabled), .mytix-item button:active { transform: scale(.94); }
+    .btn:active { transform: scale(.96); }
+    .pop { animation: pop .34s cubic-bezier(.3,1.6,.5,1); }
+    @keyframes pop { 0% { transform: scale(.94); } 50% { transform: scale(1.07); } 100% { transform: scale(1); } }
+
+    /* Pindah langkah: panel bergeser seperti aplikasi */
+    .step.in-fwd { animation: in-fwd .32s cubic-bezier(.2,.8,.2,1) both; }
+    .step.in-back { animation: in-back .32s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes in-fwd { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+    @keyframes in-back { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+
+    /* Tiket "dicetak" dari atas, lalu stempel dicap */
+    .ticket { animation: print .75s cubic-bezier(.25,.8,.25,1) both; }
+    @keyframes print {
+      from { clip-path: inset(0 0 100% 0); transform: translateY(-14px); }
+      to { clip-path: inset(-40px -40px -40px -40px); transform: none; }
+    }
+    .ticket .stamp { animation: cap .45s .75s cubic-bezier(.3,1.6,.5,1) both; }
+    @keyframes cap {
+      from { opacity: 0; transform: rotate(-6deg) scale(2.4); }
+      60% { opacity: 1; transform: rotate(-6deg) scale(.9); }
+      to { opacity: 1; transform: rotate(-6deg) scale(1); }
+    }
   }
   [hidden] { display: none !important; }
 </style>
@@ -285,8 +369,11 @@
 
   <!-- 0. Pembuka -->
   <section class="panel intro step" data-step="0">
-    <h1 tabindex="-1">Lihat langsung keseharian santri elTAHFIDH</h1>
-    <p class="lead">Pilih hari dan jam yang Ayah/Bunda inginkan. Tim kami akan menemani berkeliling asrama, kelas tahfidh, dan fasilitas olahraga.</p>
+    <img class="hero" src="img/hero.jpg" width="1000" height="563" fetchpriority="high"
+      alt="Gedung Pesantren Qur'an elTAHFIDH dari udara, santri berkumpul di halaman">
+    <div class="mytix" id="myTix" hidden></div>
+    <h1 tabindex="-1"><span class="salam">Ahlan wa sahlan</span> Ayah/Bunda</h1>
+    <p class="lead">Ajak ananda mengenal calon rumah keduanya: asrama, kelas tahfidh, dan keseharian santri. Pilih jadwal survei, kami temani berkeliling.</p>
     <p class="prog-q" id="lab-prog">Pilih program yang Ayah/Bunda minati</p>
     <div class="prog-pick" role="group" aria-labelledby="lab-prog">
       <button type="button" data-prog="SMP" aria-pressed="false" aria-controls="prog-SMP"><small>Program</small>SMP Qur'an</button>
@@ -294,6 +381,13 @@
     </div>
 
     <div class="prog" id="prog-SMP" hidden>
+      <div class="slider">
+        <div class="slides">
+          <img src="img/smp-berkuda.jpg" width="900" height="563" loading="lazy" alt="Santri SMP memanah sambil berkuda">
+          <img src="img/smp-renang.jpg" width="900" height="563" loading="lazy" alt="Santriwati SMP latihan renang">
+        </div>
+        <div class="dots"></div>
+      </div>
       <div class="prog-title">Program unggulan SMP Qur'an elTAHFIDH</div>
       <ul class="facts">
         <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Tahfidh Al-Qur'an 30 juz</li>
@@ -304,6 +398,13 @@
     </div>
 
     <div class="prog" id="prog-SMA" hidden>
+      <div class="slider">
+        <div class="slides">
+          <img src="img/sma-singapore.jpg" width="900" height="563" loading="lazy" alt="Santri SMA elTAHFIDH Singapore Trip di Merlion">
+          <img class="fit" src="img/sma-taekwondo.jpg" width="560" height="700" loading="lazy" alt="Penampilan taekwondo santri SMA di Haflah Akhir Sanah">
+        </div>
+        <div class="dots"></div>
+      </div>
       <div class="prog-title">Program unggulan SMA Qur'an elTAHFIDH</div>
       <ul class="facts">
         <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Tahfidh Al-Qur'an 20 juz</li>
@@ -519,8 +620,16 @@ const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + CONFIG.MAKS
 let view = new Date(today.getFullYear(), today.getMonth(), 1);
 
 /* ---------- Navigasi langkah ---------- */
+let curStep = 0;
 function go(n) {
-  $$('.step').forEach(s => s.hidden = Number(s.dataset.step) !== n);
+  const arah = n > curStep ? 'in-fwd' : 'in-back';
+  curStep = n;
+  $$('.step').forEach(s => {
+    const aktif = Number(s.dataset.step) === n;
+    s.hidden = !aktif;
+    s.classList.remove('in-fwd', 'in-back');
+    if (aktif && n !== 4) { void s.offsetWidth; s.classList.add(arah); } // tiket punya animasi sendiri
+  });
   const st = $('#stepper');
   st.hidden = n === 0;
   $$('#stepper li').forEach(li => {
@@ -546,11 +655,48 @@ function setJenjang(j) {
   $('#progHint').hidden = !!j;
   $('#e-jenjang').textContent = '';
 }
-$$('[data-prog]').forEach(b => b.addEventListener('click', () => setJenjang(b.dataset.prog)));
+// Efek "pop" pada pilihan yang baru dipilih
+const pop = el => { if (!el) return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); };
+
+$$('[data-prog]').forEach(b => b.addEventListener('click', () => { setJenjang(b.dataset.prog); pop(b); }));
 $('#startBtn').addEventListener('click', () => go(1));
 
+/* ---------- Slider foto program ---------- */
+const kurangiGerak = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function initSlider(sl) {
+  const track = sl.querySelector('.slides'), imgs = [...track.children], dots = sl.querySelector('.dots');
+  let idx = 0, timer = null;
+  const tandai = () => [...dots.children].forEach((d, i) => d.setAttribute('aria-current', i === idx ? 'true' : 'false'));
+  const ke = i => {
+    idx = (i + imgs.length) % imgs.length;
+    track.scrollTo({ left: idx * track.clientWidth, behavior: kurangiGerak ? 'auto' : 'smooth' });
+    tandai();
+  };
+  // Geser otomatis tiap 4 detik; jalan hanya saat slider terlihat, diulang dari awal kalau disentuh
+  const mulai = () => {
+    clearInterval(timer);
+    if (!kurangiGerak) timer = setInterval(() => { if (sl.offsetParent) ke(idx + 1); }, 4000);
+  };
+  imgs.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Foto ' + (i + 1));
+    b.addEventListener('click', () => { ke(i); mulai(); });
+    dots.appendChild(b);
+  });
+  track.addEventListener('scroll', () => {
+    const i = Math.round(track.scrollLeft / track.clientWidth);
+    if (i !== idx) { idx = i; tandai(); }
+  }, { passive: true });
+  track.addEventListener('pointerdown', mulai);
+  track.addEventListener('touchstart', mulai, { passive: true });
+  tandai();
+  mulai();
+}
+$$('.slider').forEach(initSlider);
+
 /* ---------- Langkah 1: data ---------- */
-$$('[data-jenjang]').forEach(b => b.addEventListener('click', () => setJenjang(b.dataset.jenjang)));
+$$('[data-jenjang]').forEach(b => b.addEventListener('click', () => { setJenjang(b.dataset.jenjang); pop(b); }));
 
 function normWa(v) {
   let s = String(v).replace(/\D/g, '');
@@ -619,6 +765,7 @@ function renderCal() {
       if (state.sesi && !sesiBisa(state.sesi)) state.sesi = '';
       renderCal();
       showPicked();
+      pop($('#calGrid .day[aria-pressed="true"]'));
     });
     grid.appendChild(b);
   }
@@ -651,7 +798,7 @@ function renderSesi() {
     b.setAttribute('aria-pressed', state.sesi === s.jam ? 'true' : 'false');
     b.innerHTML = '<span class="jam">' + s.jam + '</span><span class="tx"><span class="nm">' + s.nama + '</span>' +
       (b.disabled ? '<span class="ds">Sudah lewat untuk hari ini</span>' : '') + '</span>';
-    b.addEventListener('click', () => { state.sesi = s.jam; renderSesi(); });
+    b.addEventListener('click', () => { state.sesi = s.jam; renderSesi(); pop($('#sessions .sess[aria-pressed="true"]')); });
     wrap.appendChild(b);
   });
   $('#submitBtn').disabled = !state.sesi;
@@ -663,7 +810,7 @@ $('#submitBtn').addEventListener('click', async () => {
   const btn = $('#submitBtn'), err = $('#submitErr');
   err.hidden = true;
   btn.disabled = true;
-  btn.textContent = 'Menyimpan...';
+  btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Membuat tiket...';
   const payload = { ...state.data, tanggal: state.tanggal, sesi: state.sesi, website: $('#website').value };
   try {
     let kode;
@@ -680,7 +827,9 @@ $('#submitBtn').addEventListener('click', async () => {
       if (!out.ok) throw new Error(out.error || 'Booking belum tersimpan.');
       kode = out.kode;
     }
+    simpanTiket(kode);
     showTicket(kode);
+    setTimeout(konfeti, 750); // pas stempel dicap
   } catch (e) {
     err.textContent = (e && e.message && !/fetch|network|JSON/i.test(e.message))
       ? e.message
@@ -715,6 +864,82 @@ function showTicket(kode) {
   $('#demoNote').hidden = !isDemo();
   go(4);
 }
+
+/* ---------- Konfeti singkat saat tiket jadi ---------- */
+function konfeti() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = document.createElement('canvas');
+  cv.className = 'confetti';
+  document.body.appendChild(cv);
+  const ctx = cv.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+  const warna = ['#14225A', '#2F8FE3', '#C8202F', '#FFC83D'];
+  const bits = Array.from({ length: 80 }, () => ({
+    x: W / 2 + (Math.random() - .5) * W * .3, y: H * .35,
+    vx: (Math.random() - .5) * 16 * dpr, vy: (-Math.random() * 14 - 6) * dpr,
+    w: (6 + Math.random() * 6) * dpr, h: (3 + Math.random() * 4) * dpr,
+    r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: warna[Math.floor(Math.random() * 4)]
+  }));
+  const t0 = performance.now(), DUR = 1600;
+  (function frame(t) {
+    const p = (t - t0) / DUR;
+    if (p >= 1) { cv.remove(); return; }
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalAlpha = p > .7 ? (1 - p) / .3 : 1;
+    bits.forEach(b => {
+      b.vy += .5 * dpr; b.vx *= .98; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r);
+      ctx.fillStyle = b.c; ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+      ctx.restore();
+    });
+    requestAnimationFrame(frame);
+  })(t0);
+}
+
+/* ---------- Tiket tersimpan di HP ini ---------- */
+// Supaya ortu yang membuka link lagi bisa melihat tiketnya tanpa screenshot.
+const TIX_KEY = 'eltahfidh_tiket_survei';
+
+function bacaTiket() {
+  try {
+    const list = JSON.parse(localStorage.getItem(TIX_KEY) || '[]');
+    const now = ymd(today);
+    return Array.isArray(list) ? list.filter(t => t && t.kode && t.tanggal >= now) : [];
+  } catch (e) { return []; }
+}
+
+function simpanTiket(kode) {
+  const d = state.data;
+  const t = { kode, tanggal: state.tanggal, sesi: state.sesi, ortu: d.ortu, santri: d.santri, jenjang: d.jenjang, kelas: d.kelas };
+  const list = [t, ...bacaTiket().filter(x => x.kode !== kode)].slice(0, 5);
+  try { localStorage.setItem(TIX_KEY, JSON.stringify(list)); } catch (e) {}
+}
+
+function renderTiketku() {
+  const box = $('#myTix');
+  const list = bacaTiket().sort((a, b) => (a.tanggal + a.sesi).localeCompare(b.tanggal + b.sesi));
+  try { localStorage.setItem(TIX_KEY, JSON.stringify(list)); } catch (e) {} // buang yang sudah lewat
+  box.hidden = !list.length;
+  box.innerHTML = '';
+  list.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'mytix-item';
+    el.innerHTML = '<div class="mytix-tx"><div class="mytix-k">Tiket survei Ayah/Bunda</div>' +
+      '<div class="mytix-code"></div><div class="mytix-when"></div></div>' +
+      '<button type="button">Lihat tiket</button>';
+    el.querySelector('.mytix-code').textContent = t.kode;
+    el.querySelector('.mytix-when').textContent = tglPanjang(t.tanggal) + ' · ' + t.sesi + ' WIB';
+    el.querySelector('button').addEventListener('click', () => {
+      state.data = { ortu: t.ortu, santri: t.santri, jenjang: t.jenjang, kelas: t.kelas };
+      state.tanggal = t.tanggal;
+      state.sesi = t.sesi;
+      showTicket(t.kode);
+    });
+    box.appendChild(el);
+  });
+}
+renderTiketku();
 
 /* ---------- Tiket: QR lokasi (Google Maps) ---------- */
 const QR_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
@@ -830,7 +1055,10 @@ $('#saveBtn').addEventListener('click', async () => {
     if (!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
     const canvas = await html2canvas($('#ticket'), {
       backgroundColor: '#EEF3F9', scale: 2, useCORS: true,
-      onclone: doc => { doc.getElementById('ticket').style.animation = 'none'; }
+      onclone: doc => {
+        doc.getElementById('ticket').style.animation = 'none';
+        doc.querySelector('#ticket .stamp').style.animation = 'none';
+      }
     });
     const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
     const file = new File([blob], 'tiket-' + kode + '.png', { type: 'image/png' });
@@ -856,6 +1084,7 @@ $('#again').addEventListener('click', () => {
   $('#f1').reset();
   setJenjang('');
   view = new Date(today.getFullYear(), today.getMonth(), 1);
+  renderTiketku();
   go(0);
 });
 </script>
