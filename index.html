@@ -15,6 +15,23 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕌</text></svg>">
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1389872859494183');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
@@ -98,7 +115,6 @@
     flex: 0 0 100%; width: 100%; aspect-ratio: 16 / 10; height: auto; object-fit: cover;
     scroll-snap-align: center; display: block;
   }
-  .slides img.fit { object-fit: contain; }
   .dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
   .dots button {
     width: 8px; height: 8px; padding: 0; border: 0; border-radius: 99px; background: var(--line); cursor: pointer;
@@ -290,6 +306,10 @@
   .t-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .t-duo .btn { padding: 13px 10px; font-size: 15px; }
   .t-duo .btn:disabled { opacity: .6; cursor: wait; }
+  .dobel {
+    margin-bottom: 14px; padding: 12px 14px; border-radius: var(--radius-md);
+    background: var(--sky-soft); color: var(--navy); font-weight: 600; font-size: 14px; line-height: 1.45;
+  }
   .demo { margin-top: 12px; text-align: center; font-size: 12.5px; color: var(--red); font-weight: 600; }
 
   .foot { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 22px; }
@@ -401,7 +421,7 @@
       <div class="slider">
         <div class="slides">
           <img src="img/sma-singapore.jpg" width="900" height="563" loading="lazy" alt="Santri SMA elTAHFIDH Singapore Trip di Merlion">
-          <img class="fit" src="img/sma-taekwondo.jpg" width="560" height="700" loading="lazy" alt="Penampilan taekwondo santri SMA di Haflah Akhir Sanah">
+          <img src="img/sma-taekwondo.jpg" width="900" height="563" loading="lazy" alt="Penampilan taekwondo santri SMA di Haflah Akhir Sanah">
         </div>
         <div class="dots"></div>
       </div>
@@ -508,6 +528,7 @@
   <!-- 4. Tiket -->
   <section class="step ticket-wrap" data-step="4" hidden>
     <h2 tabindex="-1" class="hp">Tiket survei</h2>
+    <div class="dobel" id="dobelNote" role="status" hidden>Ayah/Bunda sudah punya tiket untuk ananda di tanggal ini, jadi kami tampilkan tiket yang sama.</div>
     <div class="ticket" id="ticket">
       <div class="t-head">
         <div class="t-arab" lang="ar">أهلًا وسهلًا</div>
@@ -558,15 +579,15 @@
       </div>
       <a class="btn btn-outline" id="mapsBtn" target="_blank" rel="noopener">Buka lokasi di Maps</a>
       <div class="follow">
-        <p>Sambil menunggu hari survei, lihat keseharian santri di Instagram dan Facebook kami</p>
+        <p>Sambil menunggu hari survei, lihat keseharian santri di Instagram dan TikTok kami</p>
         <div class="follow-btns">
           <a class="btn" href="https://www.instagram.com/eltahfidh.indonesia/" target="_blank" rel="noopener">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
             Instagram
           </a>
-          <a class="btn" href="https://www.facebook.com/elTAHFIDHIndonesia" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H7v4h3v8h4v-8h3l1-4h-4V8.5c0-.3.2-.5.5-.5z"/></svg>
-            Facebook
+          <a class="btn" href="https://www.tiktok.com/@pesantrenquraneltahfidh" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9.1a7.3 7.3 0 0 0 4.3 1.4V7.4a4.3 4.3 0 0 1-3.2-1.6z"/></svg>
+            TikTok
           </a>
         </div>
       </div>
@@ -580,8 +601,8 @@
     <a href="https://www.instagram.com/eltahfidh.indonesia/" target="_blank" rel="noopener" aria-label="Instagram elTAHFIDH">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
     </a>
-    <a href="https://www.facebook.com/elTAHFIDHIndonesia" target="_blank" rel="noopener" aria-label="Facebook elTAHFIDH">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H7v4h3v8h4v-8h3l1-4h-4V8.5c0-.3.2-.5.5-.5z"/></svg>
+    <a href="https://www.tiktok.com/@pesantrenquraneltahfidh" target="_blank" rel="noopener" aria-label="TikTok elTAHFIDH">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9.1a7.3 7.3 0 0 0 4.3 1.4V7.4a4.3 4.3 0 0 1-3.2-1.6z"/></svg>
     </a>
   </div>
 </main>
@@ -658,7 +679,16 @@ function setJenjang(j) {
 // Efek "pop" pada pilihan yang baru dipilih
 const pop = el => { if (!el) return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); };
 
-$$('[data-prog]').forEach(b => b.addEventListener('click', () => { setJenjang(b.dataset.prog); pop(b); }));
+// Meta Pixel: aman walau pixel diblokir browser/adblock
+const pixel = (ev, data) => { try { if (window.fbq) fbq('track', ev, data); } catch (e) {} };
+const sudahLihat = {};
+
+$$('[data-prog]').forEach(b => b.addEventListener('click', () => {
+  setJenjang(b.dataset.prog);
+  pop(b);
+  const j = b.dataset.prog;
+  if (!sudahLihat[j]) { sudahLihat[j] = true; pixel('ViewContent', { content_name: j + ' Qur\'an elTAHFIDH', content_category: j }); }
+}));
 $('#startBtn').addEventListener('click', () => go(1));
 
 /* ---------- Slider foto program ---------- */
@@ -813,7 +843,7 @@ $('#submitBtn').addEventListener('click', async () => {
   btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Membuat tiket...';
   const payload = { ...state.data, tanggal: state.tanggal, sesi: state.sesi, website: $('#website').value };
   try {
-    let kode;
+    let kode, dobel = false;
     if (isDemo()) {
       await new Promise(r => setTimeout(r, 600));
       kode = state.data.jenjang + '-' + String(new Date().getFullYear()).slice(2) + String(Math.floor(Math.random() * 900) + 100);
@@ -826,10 +856,15 @@ $('#submitBtn').addEventListener('click', async () => {
       const out = await res.json();
       if (!out.ok) throw new Error(out.error || 'Booking belum tersimpan.');
       kode = out.kode;
+      if (out.dobel) { dobel = true; if (out.sesi) state.sesi = out.sesi; } // sudah pernah booking: pakai tiket lama
     }
     simpanTiket(kode);
     showTicket(kode);
-    setTimeout(konfeti, 750); // pas stempel dicap
+    $('#dobelNote').hidden = !dobel;
+    if (!dobel) {
+      setTimeout(konfeti, 750); // pas stempel dicap
+      if (!isDemo()) pixel('Lead', { content_name: 'Booking survei', content_category: state.data.jenjang });
+    }
   } catch (e) {
     err.textContent = (e && e.message && !/fetch|network|JSON/i.test(e.message))
       ? e.message
@@ -862,6 +897,7 @@ function showTicket(kode) {
   setCalendar(kode);
   renderQr();
   $('#demoNote').hidden = !isDemo();
+  $('#dobelNote').hidden = true;
   go(4);
 }
 
