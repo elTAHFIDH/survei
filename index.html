@@ -385,6 +385,30 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
   }
   [hidden] { display: none !important; }
 
+  /* FAQ di halaman pembuka */
+  .faq { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .faq-title { font-weight: 800; font-size: 15px; color: var(--navy); margin: 0 0 6px; }
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq summary {
+    list-style: none; cursor: pointer; padding: 12px 28px 12px 0; position: relative;
+    font-weight: 700; font-size: 14.5px; color: var(--navy);
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after {
+    content: '+'; position: absolute; right: 4px; top: 9px; font-size: 20px; font-weight: 600; color: var(--sky);
+  }
+  .faq details[open] summary::after { content: '\2212'; }
+  .faq details p { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+
+  /* Kalender: tandai Sabtu & Minggu */
+  .day.fav:not(:disabled):not([aria-pressed="true"]) { background: #FFF4E5; color: var(--navy); font-weight: 800; }
+  .day.fav:not(:disabled)::before {
+    content: '\2605'; position: absolute; top: 2px; right: 4px; font-size: 9px; color: #E8A33D;
+  }
+  .day[aria-pressed="true"].fav::before { color: #fff; }
+  .cal-legend { margin-top: 10px; font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .cal-legend b { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; background: #FFF4E5; color: #E8A33D; font-size: 10px; }
+
   /* Tombol melayang: tanya admin via WA */
   .wa-float {
     position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 9;
@@ -394,6 +418,9 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
     box-shadow: 0 8px 24px rgba(20,34,90,.25);
   }
   .wa-float:hover { background: #1EBE5A; }
+  .wa-float { transition: bottom .2s ease; }
+  .wa-float.kecil { padding: 12px; }
+  .wa-float.kecil span { display: none; }
   .wa-float[hidden] { display: none; }
   body { padding-bottom: 76px; }
   @media (max-width: 360px) { .wa-float span { display: none; } .wa-float { padding: 14px; } }
@@ -467,6 +494,26 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
 
     <button class="btn btn-primary" style="width:100%" id="startBtn" disabled>Mulai booking</button>
     <p class="prog-hint" id="progHint">Pilih program SMP atau SMA dulu.</p>
+
+    <div class="faq">
+      <p class="faq-title">Pertanyaan yang sering ditanyakan</p>
+      <details>
+        <summary>Apakah survei gratis?</summary>
+        <p>Gratis. Ayah/Bunda cukup pilih jadwal di halaman ini, lalu datang sesuai tiket.</p>
+      </details>
+      <details>
+        <summary>Boleh ajak keluarga atau ananda?</summary>
+        <p>Boleh, justru dianjurkan. Ajak ananda supaya bisa melihat langsung calon rumah keduanya.</p>
+      </details>
+      <details>
+        <summary>Bisa langsung daftar saat survei?</summary>
+        <p>Bisa. Biaya pendaftaran Rp300.000.</p>
+      </details>
+      <details>
+        <summary>Berapa biaya mondoknya?</summary>
+        <p>SPP mulai Rp2,1 juta/bulan, sudah termasuk asrama, makan, dan semua ekskul (berkuda, memanah, renang, taekwondo). Rincian lengkapnya dijelaskan admin atau saat survei.</p>
+      </details>
+    </div>
   </section>
 
   <!-- 1. Data keluarga -->
@@ -534,6 +581,7 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
         <button class="cal-nav" id="nextM" aria-label="Bulan berikutnya"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
       </div>
       <div class="cal-grid" id="calGrid"></div>
+      <p class="cal-legend"><b>&#9733;</b> Sabtu &amp; Minggu, hari favorit ortu untuk survei</p>
     </div>
     <div class="picked" id="picked" hidden></div>
     <div class="actions">
@@ -742,6 +790,13 @@ const pop = el => { if (!el) return; el.classList.remove('pop'); void el.offsetW
 
 // Meta Pixel: aman walau pixel diblokir browser/adblock
 const pixel = (ev, data) => { try { if (window.fbq) fbq('track', ev, data); } catch (e) {} };
+// Event per langkah (sekali per kunjungan) untuk melihat ortu berhenti di mana
+const sudahLangkah = {};
+const langkah = (ev, data) => {
+  if (sudahLangkah[ev] || state.mode === 'ganti') return;
+  sudahLangkah[ev] = true;
+  try { if (window.fbq) fbq('trackCustom', ev, data || {}); } catch (e) {}
+};
 const sudahLihat = {};
 
 $$('[data-prog]').forEach(b => b.addEventListener('click', () => {
@@ -750,7 +805,7 @@ $$('[data-prog]').forEach(b => b.addEventListener('click', () => {
   const j = b.dataset.prog;
   if (!sudahLihat[j]) { sudahLihat[j] = true; pixel('ViewContent', { content_name: j + ' Qur\'an elTAHFIDH', content_category: j }); }
 }));
-$('#startBtn').addEventListener('click', () => go(1));
+$('#startBtn').addEventListener('click', () => { langkah('MulaiBooking', { content_category: state.data.jenjang || '' }); go(1); });
 
 /* ---------- Slider foto program ---------- */
 const kurangiGerak = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -824,6 +879,7 @@ $('#f1').addEventListener('submit', e => {
   check('domisili', v('domisili').length >= 2, 'Isi kota atau kecamatan.');
   if (!ok) { if (first) document.getElementById(first).focus(); return; }
   Object.assign(state.data, { ortu: kapital(v('ortu')), wa: normWa(v('wa')), santri: kapital(v('santri')), kelas: v('kelas'), domisili: v('domisili') });
+  langkah('IsiData', { content_category: state.data.jenjang });
   go(2);
 });
 ['ortu','wa','santri','kelas','domisili'].forEach(id =>
@@ -846,7 +902,8 @@ function renderCal() {
     const key = ymd(date);
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'day' + (date.getTime() === today.getTime() ? ' today' : '');
+    const akhirPekan = date.getDay() === 0 || date.getDay() === 6;
+    b.className = 'day' + (date.getTime() === today.getTime() ? ' today' : '') + (akhirPekan ? ' fav' : '');
     b.textContent = d;
     b.disabled = date < today || date > maxDate;
     b.setAttribute('aria-pressed', state.tanggal === key ? 'true' : 'false');
@@ -870,7 +927,7 @@ function showPicked() {
 }
 $('#prevM').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); renderCal(); });
 $('#nextM').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); renderCal(); });
-$('#toSesi').addEventListener('click', () => go(3));
+$('#toSesi').addEventListener('click', () => { langkah('PilihTanggal', { content_category: state.data.jenjang, akhir_pekan: [0,6].includes(new Date(state.tanggal + 'T00:00').getDay()) }); go(3); });
 
 /* ---------- Langkah 3: sesi ---------- */
 function sesiBisa(jam) {
@@ -1323,6 +1380,24 @@ $('#again').addEventListener('click', () => {
     });
   });
   a.addEventListener('click', function () { try { fbq('track', 'Contact'); } catch (e) {} });
+
+  // Jangan menutupi tombol utama: kalau tombol aksi terlihat, tombol WA naik di atasnya
+  function atur() {
+    if (a.hidden) return;
+    const step = document.querySelector('.step:not([hidden])');
+    const btns = step ? step.querySelectorAll('.btn') : [];
+    let naik = 0;
+    btns.forEach(function (b) {
+      const r = b.getBoundingClientRect();
+      if (r.height && r.bottom > 0 && r.top < innerHeight) naik = Math.max(naik, innerHeight - r.top + 12);
+    });
+    a.style.bottom = naik ? naik + 'px' : '';
+    a.classList.toggle('kecil', !!naik); // saat naik, cukup ikon supaya tidak menutupi isi
+  }
+  addEventListener('scroll', atur, { passive: true });
+  addEventListener('resize', atur);
+  new MutationObserver(atur).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  setInterval(atur, 700);
 })();
 </script>
 </body>
