@@ -716,7 +716,7 @@ function go(n) {
   if (n === 2) renderCal();
   if (n === 3) { $('#submitErr').hidden = true; renderSesi(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  const wt = $('#waTanya'); if (wt) wt.hidden = n === 4 || !wt.dataset.prog; // muncul setelah pilih program; di tiket sudah ada tombol WA sendiri
+  const wt = $('#waTanya'); if (wt) wt.hidden = !(n >= 1 && n <= 3); // muncul mulai form data diri sampai pilih sesi; di tiket sudah ada tombol WA sendiri
   const h = document.querySelector('.step[data-step="' + n + '"] [tabindex="-1"]');
   if (h) h.focus({ preventScroll: true });
 }
@@ -1316,11 +1316,10 @@ $('#again').addEventListener('click', () => {
     const msg = "Assalamu'alaikum, saya mau tanya dulu soal survei program " + prog + " Qur'an sebelum booking #SURVEI";
     a.href = 'https://wa.me/' + CONFIG.WA_ADMIN + '?text=' + encodeURIComponent(msg);
   }
-  // Tombol baru muncul setelah ortu memilih SMP / SMA
+  // Isi pesan menyesuaikan program yang dipilih (tombol tampil di form data)
   document.querySelectorAll('.prog-pick [data-prog]').forEach(function (b) {
     b.addEventListener('click', function () {
-      a.dataset.prog = b.dataset.prog; setLink(b.dataset.prog);
-      if (curStep !== 4) a.hidden = false;
+      setLink(b.dataset.prog);
     });
   });
   a.addEventListener('click', function () { try { fbq('track', 'Contact'); } catch (e) {} });
