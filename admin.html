@@ -90,6 +90,21 @@
     .acts { grid-column: 1 / -1; justify-content: flex-start; }
   }
 
+  .card.batal { opacity: .6; border-left-color: var(--muted); }
+  .card.batal .nm { text-decoration: line-through; }
+  .tag-batal { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 99px; background: var(--red-soft); color: var(--red); font-size: 12px; font-weight: 700; text-decoration: none; vertical-align: 2px; }
+  .a.merah { color: var(--red); }
+
+  /* Dialog ganti jadwal */
+  dialog { border: 0; border-radius: 18px; padding: 22px 20px; width: min(360px, calc(100vw - 32px)); box-shadow: 0 20px 50px rgba(20,34,90,.25); }
+  dialog::backdrop { background: rgba(20,34,90,.35); }
+  dialog h3 { margin: 0 0 4px; color: var(--navy); font-size: 19px; }
+  dialog p { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  dialog label { display: block; font-weight: 700; font-size: 14px; margin: 12px 0 6px; }
+  .dlg-btns { display: flex; gap: 8px; margin-top: 18px; }
+  .dlg-btns .btn { flex: 1; margin: 0; }
+  .btn-ghost { background: #EEF3F9; color: var(--navy); }
+
   .empty { background: var(--paper); border-radius: 16px; padding: 32px 20px; text-align: center; color: var(--muted); }
   .empty b { display: block; color: var(--navy); font-size: 16px; margin-bottom: 4px; }
   .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; z-index: 10; }
@@ -148,6 +163,25 @@
 
 <div class="toast" id="toast" hidden></div>
 
+<dialog id="gantiDlg">
+  <form method="dialog" id="gantiForm">
+    <h3>Ganti jadwal</h3>
+    <p id="gantiInfo"></p>
+    <label for="gTgl">Tanggal baru</label>
+    <input class="input" id="gTgl" type="date" required>
+    <label for="gSesi">Sesi</label>
+    <select class="input" id="gSesi" required>
+      <option value="08.00">08.00 WIB</option>
+      <option value="11.00">11.00 WIB</option>
+      <option value="15.00">15.00 WIB</option>
+    </select>
+    <div class="dlg-btns">
+      <button type="button" class="btn btn-ghost" id="gBatal">Batal</button>
+      <button type="submit" class="btn btn-primary" id="gSimpan">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 /* ================== PENGATURAN ================== */
 const CONFIG = {
@@ -193,7 +227,8 @@ function demoRows() {
     { kode: 'SMP-26001', waktu: add(-3) + ' 20:14', ortu: 'Siti Aminah', wa: '6281234567890', santri: 'Ahmad Faiz', jenjang: 'SMP', kelas: 'SD Kelas 6', domisili: 'Bekasi', tanggal: add(-1), sesi: '08.00', hadir: true, catatan: '' },
     { kode: 'SMA-26001', waktu: add(-2) + ' 09:02', ortu: 'Budi Santoso', wa: '6285712345678', santri: 'Rayhan', jenjang: 'SMA', kelas: 'SMP Kelas 9', domisili: 'Cibubur', tanggal: add(-1), sesi: '11.00', hadir: false, catatan: '' },
     { kode: 'SMP-26002', waktu: add(-1) + ' 19:40', ortu: 'Nurul Hidayah', wa: '6281398765432', santri: 'Zahra', jenjang: 'SMP', kelas: 'SD Kelas 6', domisili: 'Cileungsi', tanggal: add(0), sesi: '15.00', hadir: false, catatan: 'Datang bersama kakek' },
-    { kode: 'SMA-26002', waktu: add(0) + ' 07:11', ortu: 'Hendra Wijaya', wa: '6281122334455', santri: 'Fathan', jenjang: 'SMA', kelas: 'SMP Kelas 9', domisili: 'Depok', tanggal: add(3), sesi: '08.00', hadir: false, catatan: '' }
+    { kode: 'SMA-26002', waktu: add(0) + ' 07:11', ortu: 'Hendra Wijaya', wa: '6281122334455', santri: 'Fathan', jenjang: 'SMA', kelas: 'SMP Kelas 9', domisili: 'Depok', tanggal: add(3), sesi: '08.00', hadir: false, catatan: 'Diganti ortu dari Sen, 5 Okt 11.00' },
+    { kode: 'SMP-26003', waktu: add(0) + ' 09:30', ortu: 'Rina Marlina', wa: '6281233445566', santri: 'Nabila', jenjang: 'SMP', kelas: 'SD Kelas 6', domisili: 'Bogor', tanggal: add(3), sesi: '11.00', hadir: false, catatan: 'Dibatalkan ortu 30/09 09:45', status: 'Batal' }
   ];
 }
 
@@ -242,11 +277,13 @@ function render() {
   const todayKey = ymd(new Date());
   const in7 = new Date(); in7.setDate(in7.getDate() + 7); const in7Key = ymd(in7);
 
-  $('#sToday').textContent = rows.filter(r => r.tanggal === todayKey).length;
-  $('#sWeek').textContent = rows.filter(r => r.tanggal >= todayKey && r.tanggal <= in7Key).length;
-  $('#sTotal').textContent = rows.length;
-  $('#sHadir').textContent = rows.filter(r => r.hadir).length;
-  $('#sAbsen').textContent = rows.filter(r => !r.hadir && r.tanggal < todayKey).length;
+  // Angka ringkasan tidak menghitung booking yang dibatalkan
+  const aktif = rows.filter(r => r.status !== 'Batal');
+  $('#sToday').textContent = aktif.filter(r => r.tanggal === todayKey).length;
+  $('#sWeek').textContent = aktif.filter(r => r.tanggal >= todayKey && r.tanggal <= in7Key).length;
+  $('#sTotal').textContent = aktif.length;
+  $('#sHadir').textContent = aktif.filter(r => r.hadir).length;
+  $('#sAbsen').textContent = aktif.filter(r => !r.hadir && r.tanggal < todayKey).length;
 
   const q = $('#q').value.trim().toLowerCase();
   let list = rows.filter(r => {
@@ -278,22 +315,26 @@ function render() {
 }
 
 function card(r, lewat) {
-  const cls = r.hadir ? 'hadir' : (lewat ? 'absen' : '');
+  const batal = r.status === 'Batal';
+  const cls = batal ? 'batal' : r.hadir ? 'hadir' : (lewat ? 'absen' : '');
   const reminder = 'Assalamualaikum Ayah/Bunda ' + r.ortu + ', kami mengingatkan jadwal survei ke Pesantren Qur\'an elTAHFIDH:\n\n' +
     'Tanggal: ' + tglPanjang(r.tanggal) + '\nPerkiraan jam: ' + r.sesi + ' WIB\nKode booking: ' + r.kode + '\n\n' +
     'Lokasi: ' + CONFIG.MAPS_URL + '\n\nSampai jumpa, insyaAllah.';
   const chat = 'Assalamualaikum Ayah/Bunda ' + r.ortu + ', kami dari Pesantren Qur\'an elTAHFIDH terkait survei (kode ' + r.kode + ').';
   return '<div class="card ' + cls + '">' +
     '<div class="jam">' + esc(r.sesi) + '<small>WIB</small></div>' +
-    '<div class="who"><div class="nm">' + esc(r.ortu) + '</div>' +
+    '<div class="who"><div class="nm">' + esc(r.ortu) + (batal ? '<span class="tag-batal">Batal</span>' : '') + '</div>' +
     '<div class="sub">' + esc(r.santri) + ', ' + esc(r.jenjang) + ', ' + esc(r.kelas) + ', dari ' + esc(r.domisili) + '</div>' +
     '<div class="meta"><b>' + esc(r.kode) + '</b>, booking ' + esc(r.waktu) + ', WA ' + esc(r.wa) + '</div>' +
     (r.catatan ? '<div class="note">' + esc(r.catatan) + '</div>' : '') + '</div>' +
     '<div class="acts">' +
-      '<button class="a ' + (r.hadir ? 'on' : '') + '" data-hadir="' + esc(r.kode) + '" aria-pressed="' + r.hadir + '">' + (r.hadir ? 'Hadir' : 'Tandai hadir') + '</button>' +
-      '<a class="a wa" target="_blank" rel="noopener" href="https://wa.me/' + esc(r.wa) + '?text=' + encodeURIComponent(reminder) + '">Reminder WA</a>' +
+      (batal ? '' :
+        '<button class="a ' + (r.hadir ? 'on' : '') + '" data-hadir="' + esc(r.kode) + '" aria-pressed="' + r.hadir + '">' + (r.hadir ? 'Hadir' : 'Tandai hadir') + '</button>' +
+        '<a class="a wa" target="_blank" rel="noopener" href="https://wa.me/' + esc(r.wa) + '?text=' + encodeURIComponent(reminder) + '">Reminder WA</a>') +
       '<a class="a" target="_blank" rel="noopener" href="https://wa.me/' + esc(r.wa) + '?text=' + encodeURIComponent(chat) + '">Chat</a>' +
       '<button class="a" data-note="' + esc(r.kode) + '">Catatan</button>' +
+      (batal ? '' : '<button class="a" data-ganti="' + esc(r.kode) + '">Ganti jadwal</button>') +
+      '<button class="a' + (batal ? '' : ' merah') + '" data-status="' + esc(r.kode) + '">' + (batal ? 'Aktifkan lagi' : 'Batal') + '</button>' +
     '</div></div>';
 }
 
@@ -309,6 +350,19 @@ $('#list').addEventListener('click', async e => {
       toast(r.hadir ? 'Ditandai hadir' : 'Tanda hadir dibatalkan');
     } catch (err) { r.hadir = prev; render(); toast('Gagal menyimpan. Coba lagi.'); }
   }
+  const g = e.target.closest('[data-ganti]');
+  const s = e.target.closest('[data-status]');
+  if (g) bukaGanti(rows.find(x => x.kode === g.dataset.ganti));
+  if (s) {
+    const r = rows.find(x => x.kode === s.dataset.status);
+    const keBatal = r.status !== 'Batal';
+    if (keBatal && !confirm('Tandai survei ' + r.ortu + ' (' + r.kode + ') sebagai batal?')) return;
+    const prev = r.status; r.status = keBatal ? 'Batal' : ''; render();
+    try {
+      if (!isDemo()) await api({ action: 'setStatus', kode: r.kode, status: r.status });
+      toast(keBatal ? 'Ditandai batal' : 'Booking diaktifkan lagi');
+    } catch (err) { r.status = prev; render(); toast('Gagal menyimpan. Coba lagi.'); }
+  }
   if (n) {
     const r = rows.find(x => x.kode === n.dataset.note);
     const val = prompt('Catatan untuk ' + r.ortu + ' (' + r.kode + '):', r.catatan || '');
@@ -318,6 +372,41 @@ $('#list').addEventListener('click', async e => {
       if (!isDemo()) await api({ action: 'setCatatan', kode: r.kode, catatan: r.catatan });
       toast('Catatan disimpan');
     } catch (err) { r.catatan = prev; render(); toast('Gagal menyimpan. Coba lagi.'); }
+  }
+});
+
+/* ---------- Ganti jadwal (admin) ---------- */
+let gantiRow = null;
+function bukaGanti(r) {
+  gantiRow = r;
+  $('#gantiInfo').textContent = r.ortu + ' (' + r.kode + '). Sekarang: ' + tglPanjang(r.tanggal) + ', ' + r.sesi + ' WIB.';
+  $('#gTgl').value = r.tanggal;
+  $('#gSesi').value = r.sesi;
+  $('#gantiDlg').showModal();
+}
+$('#gBatal').addEventListener('click', () => $('#gantiDlg').close());
+$('#gantiForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const r = gantiRow, tanggal = $('#gTgl').value, sesi = $('#gSesi').value;
+  if (!r || !tanggal) return;
+  if (tanggal === r.tanggal && sesi === r.sesi) { $('#gantiDlg').close(); return; }
+  $('#gSimpan').disabled = true; $('#gSimpan').textContent = 'Menyimpan...';
+  try {
+    let catatan;
+    if (isDemo()) {
+      const d = parseYmd(r.tanggal);
+      catatan = (r.catatan ? r.catatan + ' · ' : '') + 'Diganti admin dari ' + HARI[d.getDay()].slice(0, 3) + ', ' + d.getDate() + ' ' + BULAN[d.getMonth()].slice(0, 3) + ' ' + r.sesi;
+    } else {
+      catatan = (await api({ action: 'adminReschedule', kode: r.kode, tanggal, sesi })).catatan;
+    }
+    Object.assign(r, { tanggal, sesi, catatan: catatan != null ? catatan : r.catatan });
+    $('#gantiDlg').close();
+    render();
+    toast('Jadwal diganti ke ' + tglPanjang(tanggal) + ', ' + sesi);
+  } catch (err) {
+    toast('Gagal menyimpan. Coba lagi.');
+  } finally {
+    $('#gSimpan').disabled = false; $('#gSimpan').textContent = 'Simpan';
   }
 });
 

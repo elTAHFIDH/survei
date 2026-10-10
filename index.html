@@ -272,6 +272,10 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
   .t-arab { font-family: 'Amiri', serif; font-size: 26px; line-height: 1.3; direction: rtl; position: relative; }
   .t-title { font-size: 14px; font-weight: 600; opacity: .8; margin-top: 2px; position: relative; }
   .t-name { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin-top: 8px; position: relative; line-height: 1.2; }
+  .t-count {
+    display: inline-block; position: relative; margin-top: 10px; padding: 4px 10px; border-radius: 99px;
+    background: var(--sky); color: #fff; font-size: 13px; font-weight: 700;
+  }
   .t-body { background: #fff; padding: 20px 22px 8px; }
   .t-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .t-k { font-size: 12.5px; color: var(--muted); font-weight: 600; }
@@ -306,6 +310,17 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
   .t-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .t-duo .btn { padding: 13px 10px; font-size: 15px; }
   .t-duo .btn:disabled { opacity: .6; cursor: wait; }
+  .ubah {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px;
+    font-size: 14px; color: var(--muted); padding: 4px 0;
+  }
+  a.ubah { text-align: center; justify-content: center; }
+  .ubah-btn {
+    background: none; border: 0; padding: 6px 2px; cursor: pointer; font-weight: 700; font-size: 14px;
+    color: var(--navy); text-decoration: underline; text-underline-offset: 3px;
+  }
+  .ubah-btn.merah { color: var(--red); }
+  .ubah-btn:disabled { opacity: .6; cursor: wait; }
   .dobel {
     margin-bottom: 14px; padding: 12px 14px; border-radius: var(--radius-md);
     background: var(--sky-soft); color: var(--navy); font-weight: 600; font-size: 14px; line-height: 1.45;
@@ -392,6 +407,7 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
     <img class="hero" src="img/hero.jpg" width="1000" height="563" fetchpriority="high"
       alt="Gedung Pesantren Qur'an elTAHFIDH dari udara, santri berkumpul di halaman">
     <div class="mytix" id="myTix" hidden></div>
+    <div class="dobel" id="introNote" role="status" hidden></div>
     <h1 tabindex="-1"><span class="salam">Ahlan wa sahlan</span> Ayah/Bunda</h1>
     <p class="lead">Ajak ananda mengenal calon rumah keduanya: asrama, kelas tahfidh, dan keseharian santri. Pilih jadwal survei, kami temani berkeliling.</p>
     <p class="prog-q" id="lab-prog">Pilih program yang Ayah/Bunda minati</p>
@@ -496,7 +512,7 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
 
   <!-- 2. Tanggal -->
   <section class="panel step" data-step="2" hidden>
-    <h2 tabindex="-1">Pilih tanggal survei</h2>
+    <h2 tabindex="-1" id="h-tanggal">Pilih tanggal survei</h2>
     <p class="lead">Semua hari bisa dipilih.</p>
     <div class="cal">
       <div class="cal-head">
@@ -534,6 +550,7 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
         <div class="t-arab" lang="ar">أهلًا وسهلًا</div>
         <div class="t-title">Tiket survei pesantren</div>
         <div class="t-name" id="tOrtu"></div>
+        <div class="t-count" id="tCount"></div>
       </div>
       <div class="t-body">
         <div class="t-row">
@@ -577,7 +594,23 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
           Ke kalender
         </a>
       </div>
-      <a class="btn btn-outline" id="mapsBtn" target="_blank" rel="noopener">Buka lokasi di Maps</a>
+      <div class="t-duo">
+        <a class="btn btn-outline" id="shareBtn" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+          Bagikan
+        </a>
+        <a class="btn btn-outline" id="mapsBtn" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s7-7.6 7-13a7 7 0 0 0-14 0c0 5.4 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          Buka Maps
+        </a>
+      </div>
+      <div class="ubah" id="ubahBox" hidden>
+        <span>Berhalangan?</span>
+        <button type="button" class="ubah-btn" id="gantiBtn">Ganti jadwal</button>
+        <span aria-hidden="true">·</span>
+        <button type="button" class="ubah-btn merah" id="batalBtn">Batalkan survei</button>
+      </div>
+      <a class="ubah ubah-btn" id="ubahAdmin" target="_blank" rel="noopener" hidden>Perlu ganti jadwal? Hubungi admin</a>
       <div class="follow">
         <p>Sambil menunggu hari survei, lihat keseharian santri di Instagram dan TikTok kami</p>
         <div class="follow-btns">
@@ -627,7 +660,8 @@ const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus
 const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const DOW = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
 
-const state = { data: {}, tanggal: '', sesi: '' };
+// mode: null = booking baru, 'ganti' = ganti jadwal dari tiket
+const state = { data: {}, tanggal: '', sesi: '', kode: '', token: '', mode: null, lama: null };
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -658,13 +692,21 @@ function go(n) {
     li.className = s < n ? 'done' : s === n ? 'now' : '';
     if (s === n) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
   });
+  const ganti = state.mode === 'ganti';
+  $('#h-tanggal').textContent = ganti ? 'Pilih tanggal baru' : 'Pilih tanggal survei';
+  $('#submitBtn').textContent = labelSubmit();
   if (n === 2) renderCal();
-  if (n === 3) renderSesi();
+  if (n === 3) { $('#submitErr').hidden = true; renderSesi(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
   const h = document.querySelector('.step[data-step="' + n + '"] [tabindex="-1"]');
   if (h) h.focus({ preventScroll: true });
 }
-$$('[data-go]').forEach(b => b.addEventListener('click', () => go(Number(b.dataset.go))));
+$$('[data-go]').forEach(b => b.addEventListener('click', () => {
+  const n = Number(b.dataset.go);
+  // Saat ganti jadwal, "Kembali" dari kalender = batal ganti, balik ke tiket
+  if (state.mode === 'ganti' && n < 2) { batalGanti(); return; }
+  go(n);
+}));
 
 /* ---------- Pembuka: pilih program ---------- */
 function setJenjang(j) {
@@ -836,47 +878,147 @@ function renderSesi() {
 
 const isDemo = () => !CONFIG.API_URL || CONFIG.API_URL.startsWith('PASTE');
 
+async function api(body) {
+  const res = await fetch(CONFIG.API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(body)
+  });
+  const out = await res.json();
+  if (!out.ok) throw new Error(out.error || 'Permintaan gagal.');
+  return out;
+}
+const pesanGagal = (e, cadangan) => (e && e.message && !/fetch|network|JSON/i.test(e.message)) ? e.message : cadangan;
+const labelSubmit = () => state.mode === 'ganti' ? 'Simpan jadwal baru' : 'Buat tiket survei';
+
 $('#submitBtn').addEventListener('click', async () => {
+  if (state.mode === 'ganti') return simpanGanti();
   const btn = $('#submitBtn'), err = $('#submitErr');
   err.hidden = true;
   btn.disabled = true;
   btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Membuat tiket...';
   const payload = { ...state.data, tanggal: state.tanggal, sesi: state.sesi, website: $('#website').value };
   try {
-    let kode, dobel = false;
+    let kode, token = '', dobel = false;
     if (isDemo()) {
       await new Promise(r => setTimeout(r, 600));
       kode = state.data.jenjang + '-' + String(new Date().getFullYear()).slice(2) + String(Math.floor(Math.random() * 900) + 100);
+      token = 'demo';
     } else {
-      const res = await fetch(CONFIG.API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'booking', data: payload })
-      });
-      const out = await res.json();
-      if (!out.ok) throw new Error(out.error || 'Booking belum tersimpan.');
+      const out = await api({ action: 'booking', data: payload });
       kode = out.kode;
+      token = out.token || '';
       if (out.dobel) { dobel = true; if (out.sesi) state.sesi = out.sesi; } // sudah pernah booking: pakai tiket lama
     }
+    state.token = token || tokenTersimpan(kode);
     simpanTiket(kode);
     showTicket(kode);
-    $('#dobelNote').hidden = !dobel;
+    if (dobel) catatanTiket('Ayah/Bunda sudah punya tiket untuk ananda di tanggal ini, jadi kami tampilkan tiket yang sama.');
     if (!dobel) {
       setTimeout(konfeti, 750); // pas stempel dicap
       if (!isDemo()) pixel('Lead', { content_name: 'Booking survei', content_category: state.data.jenjang });
     }
   } catch (e) {
-    err.textContent = (e && e.message && !/fetch|network|JSON/i.test(e.message))
-      ? e.message
-      : 'Booking belum tersimpan. Periksa koneksi internet lalu coba lagi.';
+    err.textContent = pesanGagal(e, 'Booking belum tersimpan. Periksa koneksi internet lalu coba lagi.');
     err.hidden = false;
   } finally {
-    btn.textContent = 'Buat tiket survei';
+    btn.textContent = labelSubmit();
     btn.disabled = !state.sesi;
   }
 });
 
+/* ---------- Ganti jadwal & batal (dari tiket) ---------- */
+// Tombol hanya muncul kalau HP ini punya token tiket & jam sesi belum tiba.
+const sudahMulai = (tgl, sesi) => new Date() >= new Date(parseYmd(tgl).getTime() + parseInt(sesi, 10) * 3600000);
+
+function mulaiGanti() {
+  state.mode = 'ganti';
+  state.lama = { tanggal: state.tanggal, sesi: state.sesi };
+  view = new Date(parseYmd(state.tanggal).getFullYear(), parseYmd(state.tanggal).getMonth(), 1);
+  go(2);
+}
+
+function batalGanti() {
+  state.tanggal = state.lama.tanggal;
+  state.sesi = state.lama.sesi;
+  state.mode = null;
+  go(4);
+}
+
+async function simpanGanti() {
+  const btn = $('#submitBtn'), err = $('#submitErr');
+  const { tanggal, sesi } = state, lama = state.lama;
+  if (tanggal === lama.tanggal && sesi === lama.sesi) { batalGanti(); return; }
+  err.hidden = true;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Menyimpan...';
+  try {
+    if (isDemo()) await new Promise(r => setTimeout(r, 600));
+    else await api({ action: 'reschedule', kode: state.kode, token: state.token, tanggal, sesi });
+    state.mode = null;
+    simpanTiket(state.kode);
+    showTicket(state.kode);
+    catatanTiket('Jadwal berhasil diganti ke ' + tglPanjang(tanggal) + ', ' + sesi + ' WIB. Admin sudah menerima pemberitahuan.');
+  } catch (e) {
+    err.textContent = pesanGagal(e, 'Jadwal belum tersimpan. Periksa koneksi internet lalu coba lagi.');
+    err.hidden = false;
+  } finally {
+    btn.textContent = labelSubmit();
+    btn.disabled = !state.sesi;
+  }
+}
+
+async function batalkanSurvei() {
+  if (!confirm('Batalkan survei ' + tglPanjang(state.tanggal) + ' pukul ' + state.sesi + ' WIB?')) return;
+  const btn = $('#batalBtn');
+  btn.disabled = true;
+  btn.textContent = 'Membatalkan...';
+  try {
+    if (isDemo()) await new Promise(r => setTimeout(r, 600));
+    else await api({ action: 'batal', kode: state.kode, token: state.token });
+    const kode = state.kode;
+    hapusTiket(kode);
+    $('#again').click();
+    const n = $('#introNote');
+    n.textContent = 'Survei ' + kode + ' sudah dibatalkan. Ayah/Bunda bisa booking ulang kapan saja.';
+    n.hidden = false;
+  } catch (e) {
+    alert(pesanGagal(e, 'Pembatalan belum tersimpan. Periksa koneksi internet lalu coba lagi.'));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Batalkan survei';
+  }
+}
+
+function catatanTiket(teks) {
+  const n = $('#dobelNote');
+  n.textContent = teks;
+  n.hidden = false;
+}
+
+function renderUbah() {
+  const bisa = !!state.token && !sudahMulai(state.tanggal, state.sesi);
+  $('#ubahBox').hidden = !bisa;
+  // Tiket tanpa token (booking dari HP lain / versi lama): arahkan ke admin
+  const lewatAdmin = !state.token && !sudahMulai(state.tanggal, state.sesi);
+  $('#ubahAdmin').hidden = !lewatAdmin;
+  if (lewatAdmin) {
+    const msg = 'Assalamu\'alaikum, saya ingin ganti jadwal survei (kode ' + state.kode + ', ' + tglPanjang(state.tanggal) + ' ' + state.sesi + ' WIB).';
+    $('#ubahAdmin').href = 'https://wa.me/' + CONFIG.WA_ADMIN + '?text=' + encodeURIComponent(msg);
+  }
+}
+$('#gantiBtn').addEventListener('click', mulaiGanti);
+$('#batalBtn').addEventListener('click', batalkanSurvei);
+
 /* ---------- Langkah 4: tiket ---------- */
+// "Hari ini" / "Besok" / "3 hari lagi"
+function hitungMundur(tgl) {
+  const n = Math.round((parseYmd(tgl) - parseYmd(ymd(new Date()))) / 86400000);
+  if (n <= 0) return 'Hari ini';
+  if (n === 1) return 'Besok';
+  return n + ' hari lagi';
+}
+
 function showTicket(kode) {
   const d = state.data;
   $('#tOrtu').textContent = 'Keluarga ' + d.ortu;
@@ -894,10 +1036,20 @@ function showTicket(kode) {
     'Jazakumullah khairan.';
   $('#waBtn').href = 'https://wa.me/' + CONFIG.WA_ADMIN + '?text=' + encodeURIComponent(msg);
   $('#mapsBtn').href = CONFIG.MAPS_URL;
+  $('#tCount').textContent = hitungMundur(state.tanggal);
+  // Kirim jadwal ke pasangan/keluarga lewat WA (pilih kontak sendiri)
+  const bagikan = 'Assalamu\'alaikum, ini jadwal survei ' + d.santri + ' ke Pesantren Qur\'an elTAHFIDH:\n\n' +
+    '📅 ' + tglPanjang(state.tanggal) + '\n' +
+    '🕗 Sekitar pukul ' + state.sesi + ' WIB\n' +
+    '🎫 Kode booking: ' + kode + '\n' +
+    '📍 Lokasi: ' + CONFIG.MAPS_URL;
+  $('#shareBtn').href = 'https://wa.me/?text=' + encodeURIComponent(bagikan);
   setCalendar(kode);
   renderQr();
   $('#demoNote').hidden = !isDemo();
   $('#dobelNote').hidden = true;
+  state.kode = kode;
+  renderUbah();
   go(4);
 }
 
@@ -945,11 +1097,22 @@ function bacaTiket() {
   } catch (e) { return []; }
 }
 
+// token = kunci untuk ganti jadwal/batal; kalau kosong, pakai token lama tiket yang sama (kasus booking dobel)
 function simpanTiket(kode) {
   const d = state.data;
-  const t = { kode, tanggal: state.tanggal, sesi: state.sesi, ortu: d.ortu, santri: d.santri, jenjang: d.jenjang, kelas: d.kelas };
+  const token = state.token || tokenTersimpan(kode);
+  const t = { kode, token, tanggal: state.tanggal, sesi: state.sesi, ortu: d.ortu, santri: d.santri, jenjang: d.jenjang, kelas: d.kelas };
   const list = [t, ...bacaTiket().filter(x => x.kode !== kode)].slice(0, 5);
   try { localStorage.setItem(TIX_KEY, JSON.stringify(list)); } catch (e) {}
+}
+
+function tokenTersimpan(kode) {
+  const t = bacaTiket().find(x => x.kode === kode);
+  return (t && t.token) || '';
+}
+
+function hapusTiket(kode) {
+  try { localStorage.setItem(TIX_KEY, JSON.stringify(bacaTiket().filter(x => x.kode !== kode))); } catch (e) {}
 }
 
 function renderTiketku() {
@@ -965,11 +1128,14 @@ function renderTiketku() {
       '<div class="mytix-code"></div><div class="mytix-when"></div></div>' +
       '<button type="button">Lihat tiket</button>';
     el.querySelector('.mytix-code').textContent = t.kode;
-    el.querySelector('.mytix-when').textContent = tglPanjang(t.tanggal) + ' · ' + t.sesi + ' WIB';
+    el.querySelector('.mytix-when').textContent = hitungMundur(t.tanggal) + ' · ' + tglPanjang(t.tanggal) + ' · ' + t.sesi + ' WIB';
     el.querySelector('button').addEventListener('click', () => {
       state.data = { ortu: t.ortu, santri: t.santri, jenjang: t.jenjang, kelas: t.kelas };
       state.tanggal = t.tanggal;
       state.sesi = t.sesi;
+      state.token = t.token || '';
+      state.mode = null;
+      $('#introNote').hidden = true;
       showTicket(t.kode);
     });
     box.appendChild(el);
@@ -1116,7 +1282,8 @@ $('#saveBtn').addEventListener('click', async () => {
 });
 
 $('#again').addEventListener('click', () => {
-  state.data = {}; state.tanggal = ''; state.sesi = '';
+  Object.assign(state, { data: {}, tanggal: '', sesi: '', kode: '', token: '', mode: null, lama: null });
+  $('#introNote').hidden = true;
   $('#f1').reset();
   setJenjang('');
   view = new Date(today.getFullYear(), today.getMonth(), 1);
