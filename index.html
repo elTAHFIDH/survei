@@ -544,6 +544,15 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
         <div class="errmsg" id="e-wa"></div>
       </div>
       <div class="field">
+        <label for="jenisKelamin">Jenis Kelamin</label>
+        <select class="input" id="jenisKelamin" name="jenisKelamin" required>
+          <option value="">Pilih jenis kelamin</option>
+          <option value="Putra">Putra</option>
+          <option value="Putri">Putri</option>
+        </select>
+        <div class="errmsg" id="e-jenisKelamin"></div>
+      </div>
+      <div class="field">
         <label for="santri">Nama calon santri</label>
         <input class="input" id="santri" name="santri" maxlength="80" required>
         <div class="errmsg" id="e-santri"></div>
@@ -891,14 +900,15 @@ $('#f1').addEventListener('submit', e => {
   check('wa', !!normWa(v('wa')), 'Nomor WhatsApp belum benar. Contoh: 0812 3456 7890.');
   check('santri', v('santri').length >= 2, 'Isi nama calon santri.');
   if (!state.data.jenjang) { $('#e-jenjang').textContent = 'Pilih SMP atau SMA.'; ok = false; first = first || null; }
+  check('jenisKelamin', ['Putra','Putri'].includes(v('jenisKelamin')), 'Pilih jenis kelamin.');
   check('kelas', !!v('kelas'), 'Pilih kelas anak saat ini.');
   check('domisili', v('domisili').length >= 2, 'Isi kota atau kecamatan.');
   if (!ok) { if (first) document.getElementById(first).focus(); return; }
-  Object.assign(state.data, { ortu: kapital(v('ortu')), wa: normWa(v('wa')), santri: kapital(v('santri')), kelas: v('kelas'), domisili: v('domisili') });
+  Object.assign(state.data, { ortu: kapital(v('ortu')), wa: normWa(v('wa')), santri: kapital(v('santri')), jenisKelamin: v('jenisKelamin'), kelas: v('kelas'), domisili: v('domisili') });
   langkah('IsiData', { content_category: state.data.jenjang });
   go(2);
 });
-['ortu','wa','santri','kelas','domisili'].forEach(id =>
+['ortu','wa','santri','jenisKelamin','kelas','domisili'].forEach(id =>
   document.getElementById(id).addEventListener('input', () => setErr(id, '')));
 
 /* ---------- Langkah 2: kalender ---------- */
@@ -1050,7 +1060,7 @@ async function simpanGanti() {
     state.mode = null;
     simpanTiket(state.kode);
     showTicket(state.kode);
-    catatanTiket('Jadwal berhasil diganti ke ' + tglPanjang(tanggal) + ', ' + sesi + ' WIB. Admin sudah menerima pemberitahuan.');
+    catatanTiket('Jadwal berhasil diganti ke ' + tglPanjang(tanggal) + ', ' + sesi + ' WIB. Perubahan tersimpan untuk admin.');
   } catch (e) {
     err.textContent = pesanGagal(e, 'Jadwal belum tersimpan. Periksa koneksi internet lalu coba lagi.');
     err.hidden = false;
@@ -1193,7 +1203,7 @@ function bacaTiket() {
 function simpanTiket(kode) {
   const d = state.data;
   const token = state.token || tokenTersimpan(kode);
-  const t = { kode, token, tanggal: state.tanggal, sesi: state.sesi, ortu: d.ortu, santri: d.santri, jenjang: d.jenjang, kelas: d.kelas };
+  const t = { kode, token, tanggal: state.tanggal, sesi: state.sesi, ortu: d.ortu, santri: d.santri, jenjang: d.jenjang, jenisKelamin: d.jenisKelamin || '', kelas: d.kelas };
   const list = [t, ...bacaTiket().filter(x => x.kode !== kode)].slice(0, 5);
   try { localStorage.setItem(TIX_KEY, JSON.stringify(list)); } catch (e) {}
 }
@@ -1222,7 +1232,7 @@ function renderTiketku() {
     el.querySelector('.mytix-code').textContent = t.kode;
     el.querySelector('.mytix-when').textContent = hitungMundur(t.tanggal) + ' · ' + tglPanjang(t.tanggal) + ' · ' + t.sesi + ' WIB';
     el.querySelector('button').addEventListener('click', () => {
-      state.data = { ortu: t.ortu, santri: t.santri, jenjang: t.jenjang, kelas: t.kelas };
+      state.data = { ortu: t.ortu, santri: t.santri, jenjang: t.jenjang, jenisKelamin: t.jenisKelamin || '', kelas: t.kelas };
       state.tanggal = t.tanggal;
       state.sesi = t.sesi;
       state.token = t.token || '';

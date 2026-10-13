@@ -326,6 +326,10 @@ function card(r, lewat) {
     '<div class="who"><div class="nm">' + esc(r.ortu) + (batal ? '<span class="tag-batal">Batal</span>' : '') + '</div>' +
     '<div class="sub">' + esc(r.santri) + ', ' + esc(r.jenjang) + ', ' + esc(r.kelas) + ', dari ' + esc(r.domisili) + '</div>' +
     '<div class="meta"><b>' + esc(r.kode) + '</b>, booking ' + esc(r.waktu) + ', WA ' + esc(r.wa) + '</div>' +
+    '<div class="meta">Jenis Kelamin: ' + esc(r.jenisKelamin || 'Belum tercatat') + '</div>' +
+    '<div class="meta"><label>Tanggapan orang tua setelah survei (manual) <select data-tanggapan="' + esc(r.kode) + '" aria-label="Tanggapan ' + esc(r.kode) + '">' +
+      ['Belum dinilai','Positif','Negatif'].map(v => '<option' + ((r.tanggapan || 'Belum dinilai') === v ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></label></div>' +
+    '<div class="meta"><label><input type="checkbox" data-daftar="' + esc(r.kode) + '"' + (r.sudahDaftar === true ? ' checked' : '') + '> Sudah daftar</label> · ' + (r.sudahDaftar === true ? 'Sudah daftar' : 'Belum daftar') + '</div>' +
     (r.catatan ? '<div class="note">' + esc(r.catatan) + '</div>' : '') + '</div>' +
     '<div class="acts">' +
       (batal ? '' :
@@ -339,6 +343,25 @@ function card(r, lewat) {
 }
 
 /* ---------- Aksi ---------- */
+const followupPending = new Set();
+$('#list').addEventListener('change', async e => {
+  const t = e.target.closest('[data-tanggapan], [data-daftar]');
+  if (!t) return;
+  const kode = t.dataset.tanggapan || t.dataset.daftar;
+  const r = rows.find(x => x.kode === kode);
+  if (!r || followupPending.has(kode)) { render(); return; }
+  const tanggapan = t.dataset.tanggapan ? t.value : (r.tanggapan || 'Belum dinilai');
+  const sudahDaftar = t.dataset.daftar ? t.checked : r.sudahDaftar === true;
+  if (!['Belum dinilai','Positif','Negatif'].includes(tanggapan)) { render(); return; }
+  followupPending.add(kode);
+  $$('#list [data-tanggapan], #list [data-daftar]').filter(x => (x.dataset.tanggapan || x.dataset.daftar) === kode).forEach(x => x.disabled = true);
+  try {
+    if (!isDemo()) await api({ action: 'setFollowup', kode, tanggapan, sudahDaftar });
+    Object.assign(r, { tanggapan, sudahDaftar });
+    toast('Status manual disimpan');
+  } catch (err) { toast('Gagal menyimpan. Status sebelumnya dipertahankan.'); }
+  finally { followupPending.delete(kode); render(); }
+});
 $('#list').addEventListener('click', async e => {
   const h = e.target.closest('[data-hadir]');
   const n = e.target.closest('[data-note]');
@@ -388,7 +411,7 @@ $('#gBatal').addEventListener('click', () => $('#gantiDlg').close());
 $('#gantiForm').addEventListener('submit', async e => {
   e.preventDefault();
   const r = gantiRow, tanggal = $('#gTgl').value, sesi = $('#gSesi').value;
-  if (!r || !tanggal) return;
+  if (!r || !/^\d{4}-\d{2}-\d{2}$/.test(tanggal) || ymd(parseYmd(tanggal)) !== tanggal || !['08.00','11.00','15.00'].includes(sesi)) { toast('Pilih tanggal dan sesi yang valid.'); return; }
   if (tanggal === r.tanggal && sesi === r.sesi) { $('#gantiDlg').close(); return; }
   $('#gSimpan').disabled = true; $('#gSimpan').textContent = 'Menyimpan...';
   try {
@@ -397,7 +420,7 @@ $('#gantiForm').addEventListener('submit', async e => {
       const d = parseYmd(r.tanggal);
       catatan = (r.catatan ? r.catatan + ' · ' : '') + 'Diganti admin dari ' + HARI[d.getDay()].slice(0, 3) + ', ' + d.getDate() + ' ' + BULAN[d.getMonth()].slice(0, 3) + ' ' + r.sesi;
     } else {
-      catatan = (await api({ action: 'adminReschedule', kode: r.kode, tanggal, sesi })).catatan;
+      catatan = (await api({ action: 'adminReschedule', kode: r.kode, tanggal, sesi, notify: false })).catatan;
     }
     Object.assign(r, { tanggal, sesi, catatan: catatan != null ? catatan : r.catatan });
     $('#gantiDlg').close();
