@@ -327,6 +327,8 @@ function card(r, lewat) {
     '<div class="sub">' + esc(r.santri) + ', ' + esc(r.jenjang) + ', ' + esc(r.kelas) + ', dari ' + esc(r.domisili) + '</div>' +
     '<div class="meta"><b>' + esc(r.kode) + '</b>, booking ' + esc(r.waktu) + ', WA ' + esc(r.wa) + '</div>' +
     '<div class="meta">Jenis Kelamin: ' + esc(r.jenisKelamin || 'Belum tercatat') + '</div>' +
+    '<div class="meta">Ketertarikan: ' + esc((Array.isArray(r.ketertarikan) ? r.ketertarikan.join('; ') : r.ketertarikan) || 'Belum tercatat') + (r.ketertarikanLainnya ? ' — ' + esc(r.ketertarikanLainnya) : '') + '</div>' +
+    '<div class="meta">Sumber info PSB: ' + esc(r.sumberInfo || 'Belum tercatat') + (r.sumberInfoLainnya ? ' — ' + esc(r.sumberInfoLainnya) : '') + '</div>' +
     '<div class="meta"><label>Tanggapan orang tua setelah survei (manual) <select data-tanggapan="' + esc(r.kode) + '" aria-label="Tanggapan ' + esc(r.kode) + '">' +
       ['Belum dinilai','Positif','Negatif'].map(v => '<option' + ((r.tanggapan || 'Belum dinilai') === v ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></label></div>' +
     '<div class="meta"><label><input type="checkbox" data-daftar="' + esc(r.kode) + '"' + (r.sudahDaftar === true ? ' checked' : '') + '> Sudah daftar</label> · ' + (r.sudahDaftar === true ? 'Sudah daftar' : 'Belum daftar') + '</div>' +

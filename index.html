@@ -583,6 +583,37 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
         <input class="input" id="domisili" name="domisili" maxlength="80" required>
         <div class="errmsg" id="e-domisili"></div>
       </div>
+      <fieldset class="field" style="border:0;padding:0">
+        <legend class="lab">Apa yang menarik bagi Anda dari elTAHFIDH?</legend>
+        <p class="hint">Boleh pilih lebih dari satu.</p>
+        <label><input type="checkbox" name="ketertarikan" value="Program Al-Qur’an / Tahfizh"> Program Al-Qur’an / Tahfizh</label>
+        <label><input type="checkbox" name="ketertarikan" value="KCB (Berkuda, Memanah, dan Berenang)"> KCB (Berkuda, Memanah, dan Berenang)</label>
+        <label><input type="checkbox" name="ketertarikan" value="Fasilitas"> Fasilitas</label>
+        <label><input type="checkbox" name="ketertarikan" value="Lainnya"> Lainnya</label>
+        <div id="ketertarikanLainnyaBox" hidden>
+          <label for="ketertarikanLainnya">Ketertarikan lainnya</label>
+          <input class="input" id="ketertarikanLainnya" maxlength="200" disabled>
+        </div>
+        <div class="errmsg" id="e-ketertarikanLainnya"></div>
+      </fieldset>
+      <div class="field">
+        <label for="sumberInfo">Dari mana Anda mengetahui info PSB elTAHFIDH?</label>
+        <select class="input" id="sumberInfo" name="sumberInfo">
+          <option value="">Pilih sumber info</option>
+          <option>Media sosial</option>
+          <option>Website / Google</option>
+          <option>Keluarga / Teman</option>
+          <option>Wali santri / Alumni</option>
+          <option>Sekolah / Guru</option>
+          <option>Brosur / Spanduk</option>
+          <option>Lainnya</option>
+        </select>
+        <div id="sumberInfoLainnyaBox" hidden>
+          <label for="sumberInfoLainnya">Sumber info lainnya</label>
+          <input class="input" id="sumberInfoLainnya" maxlength="200" disabled>
+        </div>
+        <div class="errmsg" id="e-sumberInfoLainnya"></div>
+      </div>
       <div class="hp" aria-hidden="true"><label>Website <input id="website" tabindex="-1" autocomplete="off"></label></div>
       <div class="actions">
         <button type="button" class="btn btn-ghost" data-go="0">Kembali</button>
@@ -595,6 +626,7 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
   <section class="panel step" data-step="2" hidden>
     <h2 tabindex="-1" id="h-tanggal">Pilih tanggal survei</h2>
     <p class="lead">Semua hari bisa dipilih.</p>
+    <button type="button" class="btn btn-outline" id="surveiSekarang" style="margin-top:16px">Survei sekarang (sudah di lokasi)</button>
     <div class="cal">
       <div class="cal-head">
         <button class="cal-nav" id="prevM" aria-label="Bulan sebelumnya"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -642,6 +674,9 @@ src="https://www.facebook.com/tr?id=1389872859494183&ev=PageView&noscript=1"
         <div class="t-row">
           <div><div class="t-k">Calon santri</div><div class="t-v" id="tSantri"></div></div>
           <div><div class="t-k">Jenjang</div><div class="t-v" id="tJenjang"></div></div>
+        </div>
+        <div class="t-row">
+          <div><div class="t-k">Jenis kelamin</div><div class="t-v" id="tJenisKelamin"></div></div>
         </div>
         <div class="t-row" style="grid-template-columns:1fr">
           <div><div class="t-k">Lokasi</div><div class="t-v" id="tAlamat" style="font-weight:600;font-size:14.5px"></div></div>
@@ -785,6 +820,7 @@ function go(n) {
   const ganti = state.mode === 'ganti';
   $('#h-tanggal').textContent = ganti ? 'Pilih tanggal baru' : 'Pilih tanggal survei';
   $('#submitBtn').textContent = labelSubmit();
+  $('#surveiSekarang').hidden = ganti;
   if (n === 2) renderCal();
   if (n === 3) { $('#submitErr').hidden = true; renderSesi(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -891,6 +927,22 @@ function setErr(id, msg) {
   return !msg;
 }
 
+function toggleSumberInfoLainnya() {
+  const aktif = $('#sumberInfo').value === 'Lainnya';
+  $('#sumberInfoLainnyaBox').hidden = !aktif;
+  $('#sumberInfoLainnya').disabled = !aktif;
+  $('#sumberInfoLainnya').required = aktif;
+  if (!aktif) { $('#sumberInfoLainnya').value = ''; setErr('sumberInfoLainnya', ''); }
+}
+$('#sumberInfo').addEventListener('change', toggleSumberInfoLainnya);
+function toggleKetertarikanLainnya() {
+  const aktif = !!document.querySelector('[name="ketertarikan"][value="Lainnya"]:checked');
+  $('#ketertarikanLainnyaBox').hidden = !aktif;
+  $('#ketertarikanLainnya').disabled = !aktif;
+  $('#ketertarikanLainnya').required = aktif;
+  if (!aktif) { $('#ketertarikanLainnya').value = ''; setErr('ketertarikanLainnya', ''); }
+}
+$$('[name="ketertarikan"]').forEach(el => el.addEventListener('change', toggleKetertarikanLainnya));
 $('#f1').addEventListener('submit', e => {
   e.preventDefault();
   const v = id => document.getElementById(id).value.trim();
@@ -903,8 +955,13 @@ $('#f1').addEventListener('submit', e => {
   check('jenisKelamin', ['Putra','Putri'].includes(v('jenisKelamin')), 'Pilih jenis kelamin.');
   check('kelas', !!v('kelas'), 'Pilih kelas anak saat ini.');
   check('domisili', v('domisili').length >= 2, 'Isi kota atau kecamatan.');
+  const ketertarikan = $$('[name="ketertarikan"]:checked').map(el => el.value);
+  check('ketertarikanLainnya', !ketertarikan.includes('Lainnya') || !!v('ketertarikanLainnya'), 'Isi ketertarikan lainnya.');
+  check('sumberInfoLainnya', v('sumberInfo') !== 'Lainnya' || !!v('sumberInfoLainnya'), 'Isi sumber info lainnya.');
   if (!ok) { if (first) document.getElementById(first).focus(); return; }
   Object.assign(state.data, { ortu: kapital(v('ortu')), wa: normWa(v('wa')), santri: kapital(v('santri')), jenisKelamin: v('jenisKelamin'), kelas: v('kelas'), domisili: v('domisili') });
+  Object.assign(state.data, { ketertarikan, ketertarikanLainnya: ketertarikan.includes('Lainnya') ? v('ketertarikanLainnya') : '' });
+  Object.assign(state.data, { sumberInfo: v('sumberInfo'), sumberInfoLainnya: v('sumberInfo') === 'Lainnya' ? v('sumberInfoLainnya') : '' });
   langkah('IsiData', { content_category: state.data.jenjang });
   go(2);
 });
@@ -912,6 +969,17 @@ $('#f1').addEventListener('submit', e => {
   document.getElementById(id).addEventListener('input', () => setErr(id, '')));
 
 /* ---------- Langkah 2: kalender ---------- */
+// Gunakan zona pesantren, bukan zona perangkat pengunjung.
+function waktuWib(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now);
+  const p = Object.fromEntries(parts.map(x => [x.type, x.value]));
+  return { tanggal: p.year + '-' + p.month + '-' + p.day, sesi: p.hour + '.' + p.minute };
+}
+$('#surveiSekarang').addEventListener('click', () => {
+  if (state.mode === 'ganti') return;
+  Object.assign(state, waktuWib(), { sekarang: true });
+  go(3);
+});
 function renderCal() {
   const y = view.getFullYear(), m = view.getMonth();
   $('#calTitle').textContent = BULAN[m] + ' ' + y;
@@ -935,6 +1003,8 @@ function renderCal() {
     b.setAttribute('aria-pressed', state.tanggal === key ? 'true' : 'false');
     b.setAttribute('aria-label', tglPanjang(key));
     b.addEventListener('click', () => {
+      state.sekarang = false;
+      if (!SESI.some(s => s.jam === state.sesi)) state.sesi = '';
       state.tanggal = key;
       if (state.sesi && !sesiBisa(state.sesi)) state.sesi = '';
       renderCal();
@@ -961,6 +1031,12 @@ function sesiBisa(jam) {
   return new Date().getHours() < parseInt(jam, 10);
 }
 function renderSesi() {
+  if (state.sekarang && state.mode !== 'ganti') {
+    $('#sesiLead').textContent = tglPanjang(state.tanggal) + ', ' + state.sesi + ' WIB — survei sekarang (sudah di lokasi).';
+    $('#sessions').innerHTML = '';
+    $('#submitBtn').disabled = false;
+    return;
+  }
   $('#sesiLead').textContent = tglPanjang(state.tanggal) + '. Pilih jam yang paling mudah untuk keluarga.';
   const wrap = $('#sessions');
   wrap.innerHTML = '';
@@ -999,7 +1075,8 @@ $('#submitBtn').addEventListener('click', async () => {
   err.hidden = true;
   btn.disabled = true;
   btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Membuat tiket...';
-  const payload = { ...state.data, tanggal: state.tanggal, sesi: state.sesi, website: $('#website').value };
+  if (state.sekarang) Object.assign(state, waktuWib());
+  const payload = { ...state.data, surveiSekarang: !!state.sekarang, tanggal: state.tanggal, sesi: state.sesi, website: $('#website').value };
   try {
     let kode, token = '', dobel = false;
     if (isDemo()) {
@@ -1010,7 +1087,10 @@ $('#submitBtn').addEventListener('click', async () => {
       const out = await api({ action: 'booking', data: payload });
       kode = out.kode;
       token = out.token || '';
-      if (out.dobel) { dobel = true; if (out.sesi) state.sesi = out.sesi; } // sudah pernah booking: pakai tiket lama
+      if (out.tanggal) state.tanggal = out.tanggal;
+      if (out.sesi) state.sesi = out.sesi;
+      if (typeof out.surveiSekarang === 'boolean') state.sekarang = out.surveiSekarang;
+      if (out.dobel) dobel = true; // jadwal respons server selalu otoritatif
     }
     state.token = token || tokenTersimpan(kode);
     simpanTiket(kode);
@@ -1031,9 +1111,10 @@ $('#submitBtn').addEventListener('click', async () => {
 
 /* ---------- Ganti jadwal & batal (dari tiket) ---------- */
 // Tombol hanya muncul kalau HP ini punya token tiket & jam sesi belum tiba.
-const sudahMulai = (tgl, sesi) => new Date() >= new Date(parseYmd(tgl).getTime() + parseInt(sesi, 10) * 3600000);
+const sudahMulai = (tgl, sesi) => new Date() >= new Date(tgl + 'T' + sesi.replace('.', ':') + ':00+07:00');
 
 function mulaiGanti() {
+  state.sekarang = false;
   state.mode = 'ganti';
   state.lama = { tanggal: state.tanggal, sesi: state.sesi };
   view = new Date(parseYmd(state.tanggal).getFullYear(), parseYmd(state.tanggal).getMonth(), 1);
@@ -1127,6 +1208,7 @@ function showTicket(kode) {
   $('#tTgl').textContent = tglPanjang(state.tanggal);
   $('#tSesi').textContent = state.sesi + ' WIB';
   $('#tSantri').textContent = d.santri;
+  $('#tJenisKelamin').textContent = d.jenisKelamin || 'Belum tercatat';
   $('#tJenjang').textContent = d.jenjang + ', ' + d.kelas;
   $('#tAlamat').textContent = CONFIG.ALAMAT;
   $('#tKode').textContent = kode;
@@ -1313,8 +1395,11 @@ let icsUrl = '';
 function setCalendar(kode) {
   const d = state.data;
   const [y, m, dd] = state.tanggal.split('-');
-  const jam = parseInt(state.sesi, 10);
-  const stamp = h => y + m + dd + 'T' + pad(h) + '0000';
+  const [jam, menit = 0] = state.sesi.split('.').map(Number);
+  const stamp = h => {
+    const date = new Date(Date.UTC(Number(y), Number(m) - 1, Number(dd), h, menit));
+    return date.toISOString().replace(/[-:]|\.\d{3}Z/g, '');
+  };
   const judul = 'Survei ke Pesantren elTAHFIDH (' + kode + ')';
   const ket = 'Kode booking: ' + kode + '\nCalon santri: ' + d.santri + ' (' + d.jenjang + ')\n' +
     'Tunjukkan kode booking saat tiba.\nLokasi: ' + CONFIG.MAPS_URL;
@@ -1397,9 +1482,11 @@ $('#saveBtn').addEventListener('click', async () => {
 });
 
 $('#again').addEventListener('click', () => {
-  Object.assign(state, { data: {}, tanggal: '', sesi: '', kode: '', token: '', mode: null, lama: null });
+  Object.assign(state, { data: {}, tanggal: '', sesi: '', kode: '', token: '', mode: null, lama: null, sekarang: false });
   $('#introNote').hidden = true;
   $('#f1').reset();
+  toggleKetertarikanLainnya();
+  toggleSumberInfoLainnya();
   setJenjang('');
   view = new Date(today.getFullYear(), today.getMonth(), 1);
   renderTiketku();
